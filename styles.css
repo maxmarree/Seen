@@ -236,6 +236,9 @@ body {
   animation: lb-in 0.2s ease;
 }
 
+/* display:flex above would override the hidden attribute without this */
+.lightbox[hidden] { display: none; }
+
 @keyframes lb-in {
   from { opacity: 0; }
   to   { opacity: 1; }
