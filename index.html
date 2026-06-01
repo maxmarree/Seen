@@ -3,13 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Seen — Brazil Wildlife</title>
+  <title>Seen</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="icon.png" />
+
+  <!-- iPhone home screen icon (the image you designed) -->
+  <link rel="apple-touch-icon" href="icon.png" />
+
+  <!-- Makes the app feel native when launched from home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Seen" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1D5D3B" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <div class="header">
-    <div class="app-title">Wildlife Tracker</div>
+    <div class="app-header">
+      <img src="icon.png" class="app-logo" alt="Seen" />
+      <div>
+        <div class="app-title">Seen</div>
+        <div class="app-tagline">Brazil Wildlife Tracker</div>
+      </div>
+    </div>
     <div class="tabs">
       <div class="tab active" data-tab="search">Search</div>
       <div class="tab" data-tab="seen">Seen</div>
