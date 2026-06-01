@@ -211,6 +211,28 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
+// ─── Lightbox ─────────────────────────────────────────────────
+function openLightbox() {
+  // Reuse whichever large image is already cached for this animal
+  const url = activeAnimalId && largeCache[activeAnimalId];
+  if (!url) return; // no image loaded yet — nothing to show
+
+  const lb  = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  const animal = animals.find(a => a.id === activeAnimalId);
+
+  img.src = url;
+  img.alt = animal ? animal.commonName : '';
+  lb.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  lb.hidden = true;
+  // keep body scroll locked — modal is still open underneath
+}
+
 function updateModalBtn() {
   const btn    = document.getElementById('modal-seen-btn');
   const isSeen = seenList.includes(activeAnimalId);
@@ -247,10 +269,19 @@ document.addEventListener('click', (e) => {
 
   if (e.target.closest('#close-modal-btn')) { closeModal(); return; }
   if (e.target.closest('#modal-seen-btn') && activeAnimalId) { toggleSeen(activeAnimalId); return; }
+
+  // Tap the header image → open lightbox
+  if (e.target.closest('#modal-img')) { openLightbox(); return; }
+
+  // Tap anywhere in the lightbox (including close btn) → close it
+  if (e.target.closest('.lightbox')) { closeLightbox(); return; }
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && activeAnimalId) closeModal();
+  if (e.key === 'Escape') {
+    if (!document.getElementById('lightbox').hidden) { closeLightbox(); return; }
+    if (activeAnimalId) closeModal();
+  }
 });
 
 // ─── Boot ─────────────────────────────────────────────────────
