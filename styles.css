@@ -500,3 +500,123 @@ body {
 /* ─── Modal backdrop ──────────────────────────────────────── */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
 .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+
+
+/* ─── Adaptive header ─────────────────────────────────────────
+   Landing state: brand (logo + title + tagline)
+   Category state: back button + centred title
+   Both share the same frosted glass background               */
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.header-nav[hidden] { display: none; }
+.header-brand[hidden] { display: none; }
+
+.header-back-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-dark);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-nav-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-dark);
+  flex: 1;
+  text-align: center;
+}
+
+.header-nav-spacer { width: 36px; flex-shrink: 0; }
+
+/* ─── Landing page ────────────────────────────────────────────*/
+.landing-content {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.landing-title {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #000000;
+  padding-top: 8px;
+}
+
+.landing-search {
+  background: #E6E6E6;
+  border: none;
+  margin: 0;
+}
+
+.landing-search #search-input::placeholder { color: #757575; }
+.landing-search .search-icon { color: #757575; }
+
+/* ─── Search results header ───────────────────────────────────*/
+.search-results-header {
+  padding: 12px 20px 4px;
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* ─── Category grid ───────────────────────────────────────────*/
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.category-card {
+  background: #FFFFFF;
+  border: 1px solid #F3F3F3;
+  border-radius: 12px;
+  padding: 0 16px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.category-card:active { background: #F5F5F5; }
+
+.category-card-emoji {
+  font-size: 26px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.category-card-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303030;
+  white-space: nowrap;
+}
+
+.category-card-count {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}

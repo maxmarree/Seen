@@ -16,28 +16,62 @@
 </head>
 <body>
 
-  <!-- ── Fixed header ─────────────────────────────────────── -->
-  <header class="header">
-    <img src="icon.png" class="app-logo" alt="Seen" />
-    <div>
-      <div class="app-title">Seen</div>
-      <div class="app-tagline">Brazil Wildlife Tracker</div>
+  <!-- ── Adaptive header ──────────────────────────────────────── -->
+  <header class="header" id="main-header">
+    <!-- Landing state: brand logo -->
+    <div class="header-brand" id="header-brand">
+      <img src="icon.png" class="app-logo" alt="Seen" />
+      <div>
+        <div class="app-title">Seen</div>
+        <div class="app-tagline">Brazil Wildlife Tracker</div>
+      </div>
+    </div>
+    <!-- Category state: back + title -->
+    <div class="header-nav" id="header-nav" hidden>
+      <button class="header-back-btn" id="animals-back-btn" aria-label="Back to Animals">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="header-nav-title" id="header-nav-title"></span>
+      <div class="header-nav-spacer"></div>
     </div>
   </header>
 
-  <!-- ── Animals view ─────────────────────────────────────── -->
+  <!-- ── Animals view ─────────────────────────────────────────── -->
   <div id="animals-view" class="view">
-    <div class="sticky-controls">
-      <div class="search-wrapper">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="search" id="search-input" placeholder="Search animals…" autocomplete="off" />
+
+    <!-- Level 1: Landing page -->
+    <div id="animals-landing">
+      <div class="landing-content">
+        <h1 class="landing-title">Animals</h1>
+
+        <!-- Cross-category search -->
+        <div class="search-wrapper landing-search">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="search-input" placeholder="Search all animals…" autocomplete="off" />
+        </div>
+
+        <!-- Category grid -->
+        <div class="category-grid" id="category-grid"></div>
       </div>
-      <div class="filters" id="category-filters"></div>
     </div>
-    <div class="list-container" id="animal-list"></div>
+
+    <!-- Level 2: Category animal list -->
+    <div id="animals-category" hidden>
+      <div class="sticky-controls">
+        <div class="filters" id="subcategory-filters"></div>
+      </div>
+      <div class="list-container" id="animal-list"></div>
+    </div>
+
+    <!-- Level 2 (search): Cross-category results -->
+    <div id="animals-search" hidden>
+      <div class="search-results-header" id="search-results-header"></div>
+      <div class="list-container" id="search-results-list"></div>
+    </div>
+
   </div>
 
-  <!-- ── Seen view ─────────────────────────────────────────── -->
+  <!-- ── Seen view ─────────────────────────────────────────────── -->
   <div id="seen-view" class="view" hidden>
     <div class="stats-container">
       <div class="stats-number" id="seen-count">0</div>
@@ -46,7 +80,7 @@
     <div class="list-container" id="seen-list"></div>
   </div>
 
-  <!-- ── Today view (placeholder) ────────────────────────── -->
+  <!-- ── Today view ────────────────────────────────────────────── -->
   <div id="today-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -56,17 +90,17 @@
     </div>
   </div>
 
-  <!-- ── Places view (placeholder) ───────────────────────── -->
+  <!-- ── Places view ───────────────────────────────────────────── -->
   <div id="places-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
       <h2>Places</h2>
-      <p>Wildlife hotspots — national parks, lodges, and trails ranked by species diversity across both regions.</p>
+      <p>Wildlife hotspots — national parks, lodges, and trails ranked by species diversity.</p>
       <div class="dev-badge">In Development</div>
     </div>
   </div>
 
-  <!-- ── Add view (placeholder) ───────────────────────────── -->
+  <!-- ── Add view ──────────────────────────────────────────────── -->
   <div id="add-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -76,10 +110,8 @@
     </div>
   </div>
 
-  <!-- ── Detail modal ──────────────────────────────────────── -->
+  <!-- ── Detail modal ──────────────────────────────────────────── -->
   <div class="modal" id="detail-modal" aria-modal="true" role="dialog" aria-hidden="true">
-
-    <!-- Sticky nav: transparent over hero, blurs on scroll -->
     <nav class="detail-nav" id="detail-nav">
       <button class="detail-nav-btn" id="close-modal-btn" aria-label="Go back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
@@ -89,8 +121,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
     </nav>
-
-    <!-- Hero image (extends behind the nav via negative margin) -->
     <div class="detail-hero" id="modal-img">
       <div class="hero-gradient-top"></div>
       <div class="hero-gradient-bottom"></div>
@@ -99,11 +129,7 @@
         <span class="material-symbols-outlined">expand_content</span>
       </button>
     </div>
-
-    <!-- Content card — rounded top, overlaps hero -->
     <div class="detail-card">
-
-      <!-- Status chips -->
       <div class="chip-row">
         <button class="chip chip-seen-btn" id="modal-seen-btn" aria-label="Toggle seen status">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -112,50 +138,28 @@
         <span class="chip chip-rarity" id="modal-rarity-chip"></span>
         <span class="chip" id="modal-conservation-chip" hidden></span>
       </div>
-
-      <!-- Description -->
       <p class="detail-desc" id="modal-desc"></p>
-
-      <!-- Stats horizontal scroll -->
       <div class="stats-scroll">
         <div class="stat-card">
           <div class="stat-row">
-            <div class="stat-cell">
-              <span class="stat-label-sm">Length</span>
-              <span class="stat-value-lg" id="modal-length">—</span>
-            </div>
-            <div class="stat-cell stat-cell-right">
-              <span class="stat-label-sm">Weight</span>
-              <span class="stat-value-lg" id="modal-weight">—</span>
-            </div>
+            <div class="stat-cell"><span class="stat-label-sm">Length</span><span class="stat-value-lg" id="modal-length">—</span></div>
+            <div class="stat-cell stat-cell-right"><span class="stat-label-sm">Weight</span><span class="stat-value-lg" id="modal-weight">—</span></div>
           </div>
           <div class="stat-row stat-row-border">
-            <div class="stat-cell">
-              <span class="stat-label-sm">Region</span>
-              <span class="stat-value-lg" id="modal-regions-stat">—</span>
-            </div>
-            <div class="stat-cell stat-cell-right">
-              <span class="stat-label-sm">Group</span>
-              <span class="stat-value-lg" id="modal-group-stat">—</span>
-            </div>
+            <div class="stat-cell"><span class="stat-label-sm">Region</span><span class="stat-value-lg" id="modal-regions-stat">—</span></div>
+            <div class="stat-cell stat-cell-right"><span class="stat-label-sm">Group</span><span class="stat-value-lg" id="modal-group-stat">—</span></div>
           </div>
         </div>
       </div>
-
-      <!-- Habitat -->
       <section class="detail-section">
         <h3 class="section-heading">Habitat</h3>
         <p class="section-body" id="modal-habitat"></p>
         <div class="habitat-chips" id="modal-habitat-chips"></div>
       </section>
-
-      <!-- Places -->
       <section class="detail-section">
         <h3 class="section-heading">Places</h3>
         <div class="places-list" id="modal-places"></div>
       </section>
-
-      <!-- Experiences -->
       <section class="detail-section detail-section-last">
         <h3 class="section-heading">Experiences</h3>
         <div class="experiences-empty">
@@ -163,17 +167,16 @@
           <p>No sightings logged yet.<br/>Be the first to spot this animal!</p>
         </div>
       </section>
-
     </div>
   </div>
 
-  <!-- ── Lightbox ──────────────────────────────────────────── -->
+  <!-- ── Lightbox ──────────────────────────────────────────────── -->
   <div id="lightbox" class="lightbox" hidden>
     <img id="lightbox-img" src="" alt="" />
     <button class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
   </div>
 
-  <!-- ── Bottom tab bar ────────────────────────────────────── -->
+  <!-- ── Bottom tab bar ────────────────────────────────────────── -->
   <nav class="tab-bar" role="navigation" aria-label="Main navigation">
     <button class="tab-item" data-tab="today" aria-label="Today">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -201,6 +204,7 @@
   <script src="rarity.js"></script>
   <script src="conservation.js"></script>
   <script src="data.js"></script>
+  <script src="data-extra.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
