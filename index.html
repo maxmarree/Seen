@@ -4,15 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Seen</title>
-
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Seen" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#1D5D3B" />
-
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=expand_content" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -52,7 +51,7 @@
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <h2>Today</h2>
-      <p>Your daily wildlife briefing — active species, recent community sightings, and what to look for right now in the Pantanal and Mata Atlântica.</p>
+      <p>Your daily wildlife briefing — active species, recent community sightings, and what to look for right now.</p>
       <div class="dev-badge">In Development</div>
     </div>
   </div>
@@ -62,7 +61,7 @@
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
       <h2>Places</h2>
-      <p>Explore wildlife hotspots — national parks, lodges, and trails ranked by species diversity across both regions.</p>
+      <p>Wildlife hotspots — national parks, lodges, and trails ranked by species diversity across both regions.</p>
       <div class="dev-badge">In Development</div>
     </div>
   </div>
@@ -72,42 +71,99 @@
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       <h2>Log a Sighting</h2>
-      <p>Record exactly where and when you spotted an animal — with GPS coordinates, photos, and notes — and contribute to the community database.</p>
+      <p>Record where and when you spotted an animal — with GPS, photos, and notes.</p>
       <div class="dev-badge">In Development</div>
     </div>
   </div>
 
   <!-- ── Detail modal ──────────────────────────────────────── -->
   <div class="modal" id="detail-modal" aria-modal="true" role="dialog" aria-hidden="true">
-    <div class="modal-header-img" id="modal-img">
-      <button class="back-btn" id="close-modal-btn" aria-label="Go back">
+
+    <!-- Sticky nav: transparent over hero, blurs on scroll -->
+    <nav class="detail-nav" id="detail-nav">
+      <button class="detail-nav-btn" id="close-modal-btn" aria-label="Go back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
       </button>
+      <span class="detail-nav-title" id="detail-nav-title"></span>
+      <button class="detail-nav-btn" id="heart-btn" aria-label="Save to favourites">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+    </nav>
+
+    <!-- Hero image (extends behind the nav via negative margin) -->
+    <div class="detail-hero" id="modal-img">
+      <div class="hero-gradient-top"></div>
+      <div class="hero-gradient-bottom"></div>
+      <div class="hero-animal-name" id="modal-hero-name"></div>
       <button class="expand-btn" aria-label="View full image">
         <span class="material-symbols-outlined">expand_content</span>
       </button>
     </div>
-    <div class="modal-content">
-      <div class="modal-title-row">
-        <div class="modal-title" id="modal-name"></div>
-        <span class="rarity-badge" id="modal-rarity"></span>
-      </div>
-      <div class="modal-scientific" id="modal-scientific"></div>
 
-      <div class="action-bar">
-        <button class="btn-seen" id="modal-seen-btn">Mark as Seen</button>
-      </div>
+    <!-- Content card — rounded top, overlaps hero -->
+    <div class="detail-card">
 
-      <div class="stats-grid">
-        <div class="stat-box"><div class="stat-label">Weight</div><div class="stat-value" id="modal-weight">—</div></div>
-        <div class="stat-box"><div class="stat-label">Length</div><div class="stat-value" id="modal-length">—</div></div>
+      <!-- Status chips -->
+      <div class="chip-row">
+        <button class="chip chip-seen-btn" id="modal-seen-btn" aria-label="Toggle seen status">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="modal-seen-label">Mark as Seen</span>
+        </button>
+        <span class="chip chip-rarity" id="modal-rarity-chip"></span>
+        <span class="chip" id="modal-conservation-chip" hidden></span>
       </div>
 
-      <div class="stat-label">Description</div>
-      <div class="description" id="modal-desc"></div>
+      <!-- Description -->
+      <p class="detail-desc" id="modal-desc"></p>
 
-      <div class="stat-label">Regions</div>
-      <div class="description" id="modal-regions" style="font-weight:600;"></div>
+      <!-- Stats horizontal scroll -->
+      <div class="stats-scroll">
+        <div class="stat-card">
+          <div class="stat-row">
+            <div class="stat-cell">
+              <span class="stat-label-sm">Length</span>
+              <span class="stat-value-lg" id="modal-length">—</span>
+            </div>
+            <div class="stat-cell stat-cell-right">
+              <span class="stat-label-sm">Weight</span>
+              <span class="stat-value-lg" id="modal-weight">—</span>
+            </div>
+          </div>
+          <div class="stat-row stat-row-border">
+            <div class="stat-cell">
+              <span class="stat-label-sm">Region</span>
+              <span class="stat-value-lg" id="modal-regions-stat">—</span>
+            </div>
+            <div class="stat-cell stat-cell-right">
+              <span class="stat-label-sm">Group</span>
+              <span class="stat-value-lg" id="modal-group-stat">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Habitat -->
+      <section class="detail-section">
+        <h3 class="section-heading">Habitat</h3>
+        <p class="section-body" id="modal-habitat"></p>
+        <div class="habitat-chips" id="modal-habitat-chips"></div>
+      </section>
+
+      <!-- Places -->
+      <section class="detail-section">
+        <h3 class="section-heading">Places</h3>
+        <div class="places-list" id="modal-places"></div>
+      </section>
+
+      <!-- Experiences -->
+      <section class="detail-section detail-section-last">
+        <h3 class="section-heading">Experiences</h3>
+        <div class="experiences-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#CAC4D0" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p>No sightings logged yet.<br/>Be the first to spot this animal!</p>
+        </div>
+      </section>
+
     </div>
   </div>
 
@@ -143,6 +199,7 @@
   </nav>
 
   <script src="rarity.js"></script>
+  <script src="conservation.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
