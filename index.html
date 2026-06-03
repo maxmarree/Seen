@@ -39,25 +39,25 @@
   <!-- ── Animals view ─────────────────────────────────────────── -->
   <div id="animals-view" class="view">
 
-    <!-- Level 1: Landing page -->
+    <!-- Persistent sticky search — stays visible at all Animals levels -->
+    <div class="animals-search-sticky">
+      <div class="search-wrapper animals-search-inner">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="search-input" placeholder="Search all animals…" autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- Level 1: Landing page (big title + category grid) -->
     <div id="animals-landing">
       <div class="landing-content">
         <h1 class="landing-title">Animals</h1>
-
-        <!-- Cross-category search -->
-        <div class="search-wrapper landing-search">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="search" id="search-input" placeholder="Search all animals…" autocomplete="off" />
-        </div>
-
-        <!-- Category grid -->
         <div class="category-grid" id="category-grid"></div>
       </div>
     </div>
 
     <!-- Level 2: Category animal list -->
     <div id="animals-category" hidden>
-      <div class="sticky-controls">
+      <div class="sticky-controls sticky-controls-cats">
         <div class="filters" id="subcategory-filters"></div>
       </div>
       <div class="list-container" id="animal-list"></div>

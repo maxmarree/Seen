@@ -47,29 +47,49 @@ const PLACES = {
 };
 const CON_LABELS = { NT:"Near Threatened",VU:"Vulnerable",EN:"Endangered",CR:"Critically Endangered" };
 
-// ─── Image cache ──────────────────────────────────────────────
-const thumbCache = {};
-const largeCache = {};
+// ─── Image fetcher: iNaturalist → Wikipedia fallback ─────────
+// iNaturalist is a wildlife-specific platform — photos are
+// verified observations, so "Corvina" returns a fish, not grapes.
+// Wikipedia is kept as a fallback for species with no iNat photos.
 
-async function fetchWikiImage(animal, elementId, isBackground = false) {
+async function fetchAnimalImage(animal, elementId, isBackground = false) {
   const cache = isBackground ? largeCache : thumbCache;
-  const size  = isBackground ? 800 : 200;
   const id    = animal.id;
 
   if (id in cache) { applyImage(cache[id], elementId, isBackground); return; }
 
-  const buildUrl = t =>
-    `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(t)}&prop=pageimages&format=json&pithumbsize=${size}&origin=*&redirects=1`;
-
-  const tryFetch = async t => {
-    const r = await fetch(buildUrl(t));
-    const d = await r.json();
-    const pages = d.query.pages;
-    const pid   = Object.keys(pages)[0];
-    return (pid !== '-1' && pages[pid].thumbnail) ? pages[pid].thumbnail.source : null;
-  };
-
+  // ── 1. iNaturalist (wildlife-specific, most reliable) ────────
   try {
+    const inatUrl =
+      `https://api.inaturalist.org/v1/taxa` +
+      `?q=${encodeURIComponent(animal.scientificName)}` +
+      `&per_page=1&order_by=observations_count`;
+    const res   = await fetch(inatUrl);
+    const data  = await res.json();
+    const photo = data.results?.[0]?.default_photo;
+    if (photo) {
+      // iNaturalist square URLs follow a predictable pattern;
+      // swap 'square' → 'medium' (500 px) for both thumb and hero
+      const raw = photo.medium_url || photo.square_url;
+      const url = raw?.replace('/square.', '/medium.') ?? raw;
+      if (url) { cache[id] = url; applyImage(url, elementId, isBackground); return; }
+    }
+  } catch { /* fall through */ }
+
+  // ── 2. Wikipedia fallback ─────────────────────────────────────
+  try {
+    const size    = isBackground ? 800 : 300;
+    const buildUrl = t =>
+      `https://en.wikipedia.org/w/api.php?action=query` +
+      `&titles=${encodeURIComponent(t)}` +
+      `&prop=pageimages&format=json&pithumbsize=${size}&origin=*&redirects=1`;
+    const tryFetch = async t => {
+      const r = await fetch(buildUrl(t));
+      const d = await r.json();
+      const pages = d.query.pages;
+      const pid   = Object.keys(pages)[0];
+      return (pid !== '-1' && pages[pid].thumbnail) ? pages[pid].thumbnail.source : null;
+    };
     const url = (await tryFetch(animal.scientificName)) || (await tryFetch(animal.commonName));
     cache[id] = url;
     applyImage(url, elementId, isBackground);
@@ -108,7 +128,7 @@ function createCardHTML(animal) {
 }
 
 function loadImages(list) {
-  list.forEach(a => { if (!(a.id in thumbCache)) fetchWikiImage(a, `img-${a.id}`, false); });
+  list.forEach(a => { if (!(a.id in thumbCache)) fetchAnimalImage(a, `img-${a.id}`, false); });
 }
 
 // ─── Category grid (landing page) ────────────────────────────
@@ -141,12 +161,22 @@ function renderSubcategoryFilters(category) {
 // ─── Animal list (category view) ─────────────────────────────
 function renderAnimalList() {
   const { category, subCategory } = animalsNav;
-  const list = animals.filter(a =>
+  let list = animals.filter(a =>
     a.mainCategory === category &&
     (subCategory === 'All' || a.subCategory === subCategory)
   );
+  // Also apply in-category search if active
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(a =>
+      a.commonName.toLowerCase().includes(q) ||
+      a.scientificName.toLowerCase().includes(q)
+    );
+  }
   const container = document.getElementById('animal-list');
-  container.innerHTML = list.map(createCardHTML).join('');
+  container.innerHTML = list.length
+    ? list.map(createCardHTML).join('')
+    : `<div class="empty-state">No ${category.toLowerCase()} match "${searchQuery}"</div>`;
   loadImages(list);
 }
 
@@ -174,7 +204,9 @@ function showAnimalsLanding() {
   animalsNav.category = null;
   animalsNav.subCategory = 'All';
   searchQuery = '';
-  document.getElementById('search-input').value = '';
+  const inp = document.getElementById('search-input');
+  inp.value       = '';
+  inp.placeholder = 'Search all animals…';
 
   document.getElementById('animals-landing').hidden  = false;
   document.getElementById('animals-category').hidden = true;
@@ -190,6 +222,9 @@ function showAnimalsCategory(category) {
   animalsNav.level = 'category';
   animalsNav.category = category;
   animalsNav.subCategory = 'All';
+  // Keep any existing search query — it will filter within the category
+  const inp = document.getElementById('search-input');
+  inp.placeholder = `Search ${category}…`;
 
   document.getElementById('animals-landing').hidden  = true;
   document.getElementById('animals-category').hidden = false;
@@ -268,7 +303,7 @@ function openDetail(id) {
   heroEl.style.backgroundImage = 'none';
   heroEl.style.backgroundColor = '#BBBBBB';
   if (largeCache[id]) { heroEl.style.backgroundImage = `url('${largeCache[id]}')`; }
-  else { fetchWikiImage(animal, 'modal-img', true); }
+  else { fetchAnimalImage(animal, 'modal-img', true); }
 
   updateSeenChip();
 
@@ -353,16 +388,25 @@ function openLightbox() {
 }
 function closeLightbox() { document.getElementById('lightbox').hidden = true; }
 
-// ─── Swipe right to close modal ───────────────────────────────
-let swipeStartX = 0, swipeStartY = 0, isSwiping = false;
+// ─── Swipe right to close modal (LEFT EDGE ONLY) ─────────────
+// Only activates when the touch starts within 24 px of the left
+// screen edge — identical to the iOS back-swipe behaviour.
+// This prevents horizontal chip/stat scrolling from triggering it.
+let swipeStartX = 0, swipeStartY = 0, isSwiping = false, swipeEligible = false;
 const modal = document.getElementById('detail-modal');
 
 modal.addEventListener('touchstart', e => {
-  swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY;
-  isSwiping = false; modal.style.transition = 'none';
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+  isSwiping   = false;
+
+  // Only allow swipe-back when starting within 24 px of the left edge
+  swipeEligible = swipeStartX <= 24;
+  if (swipeEligible) modal.style.transition = 'none';
 }, { passive: true });
 
 modal.addEventListener('touchmove', e => {
+  if (!swipeEligible) return;               // ignore touches from elsewhere
   const dx = e.touches[0].clientX - swipeStartX;
   const dy = e.touches[0].clientY - swipeStartY;
   if (!isSwiping && Math.abs(dx) > Math.abs(dy) && dx > 8) isSwiping = true;
@@ -373,7 +417,7 @@ modal.addEventListener('touchmove', e => {
 }, { passive: true });
 
 modal.addEventListener('touchend', e => {
-  if (!isSwiping) return;
+  if (!swipeEligible || !isSwiping) return;
   const dx = e.changedTouches[0].clientX - swipeStartX;
   if (dx > 100) {
     modal.style.transition = 'transform 0.22s ease';
@@ -419,11 +463,27 @@ document.addEventListener('click', e => {
   if (e.target.closest('.lightbox')) { closeLightbox(); return; }
 });
 
-// Search input
+// Search input — works at all Animals levels
 document.getElementById('search-input').addEventListener('input', e => {
   searchQuery = e.target.value.trim();
-  if (searchQuery) { showAnimalsSearch(); }
-  else { showAnimalsLanding(); }
+
+  if (!searchQuery) {
+    // Cleared: return to wherever the user was
+    if (animalsNav.level === 'category') {
+      renderAnimalList();          // re-render full category list (no filter)
+    } else {
+      showAnimalsLanding();        // back to grid
+    }
+    return;
+  }
+
+  if (animalsNav.level === 'category') {
+    // Filter within the current category — stay on category view
+    renderAnimalList();
+  } else {
+    // Cross-category search from landing
+    showAnimalsSearch();
+  }
 });
 
 // Keyboard

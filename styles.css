@@ -233,6 +233,7 @@ body {
   overflow-x: hidden;
   will-change: transform;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;   /* prevents bouncing past the top */
 }
 .modal.active { transform: translateX(0); }
 
@@ -619,4 +620,48 @@ body {
   font-size: 12px;
   color: var(--text-light);
   margin-top: 2px;
+}
+
+
+/* ─── Persistent animals search bar ──────────────────────────
+   Sits sticky below the main header on every Animals sub-view.
+   The search-input is never hidden, so typing a full query works. */
+:root {
+  --search-bar-h: 62px;   /* height of the sticky search bar */
+}
+
+.animals-search-sticky {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 31;
+  background: var(--bg);
+  padding: 10px 16px;
+  height: var(--search-bar-h);
+}
+
+.animals-search-inner {
+  background: #E6E6E6;
+  border: none;
+  margin: 0;
+}
+
+.animals-search-inner #search-input::placeholder { color: #757575; }
+.animals-search-inner .search-icon { color: #757575; }
+
+/* Landing content — no search bar inside anymore */
+.landing-content {
+  padding: 8px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Sub-category chips on category level:
+   must stick below header + search bar */
+.sticky-controls-cats {
+  position: sticky;
+  top: calc(var(--header-h) + var(--search-bar-h));
+  z-index: 30;
+  background: var(--bg);
+  padding-top: 10px;
 }
