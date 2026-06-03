@@ -342,11 +342,13 @@ body {
   border-radius: 16px 16px 0 0;
   margin-top: -20px;
   min-height: 60vh;
-  padding: 20px;
+  /* padding-top = overlap(20px) + visible space(20px) = 40px */
+  padding: 40px 20px calc(100px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  /* shadow makes the rounded corners pop against any hero image colour */
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* ─── Status chips ────────────────────────────────────────── */
