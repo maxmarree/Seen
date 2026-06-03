@@ -202,15 +202,18 @@ body {
   bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   left: 16px;
   right: 16px;
-  height: var(--tabbar-h);
-  background: var(--card-bg);
-  border-radius: 26px;
-  box-shadow: 0 4px 28px rgba(0,0,0,0.13);
+  height: var(--tabbar-h);                       /* 64px */
+  background: rgba(255, 255, 255, 0.65);         /* frosted glass */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(225, 225, 225, 0.35);   /* subtle outer ring */
+  border-radius: 24px;                            /* matches Figma 24px */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;                /* matches Figma */
+  padding: 0 16px;                               /* matches Figma nav padding */
   z-index: 40;
-  padding: 0 4px;
 }
 
 /* Center + button — defined above in tab-item section */
@@ -283,10 +286,10 @@ body {
   line-height: 1;
 }
 
-/* ─── Tab item — active colour ────────────────────────────── */
+/* ─── Tab item ────────────────────────────────────────────── */
 .tab-item {
   flex: 1;
-  position: relative;           /* needed for indicator ::after */
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -295,32 +298,34 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-light);
-  font-size: 11px;
-  font-weight: 500;
-  padding: 8px 0 10px;          /* extra bottom padding for indicator */
+  color: #0D2818;                  /* Figma label/icon colour */
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  padding: 5px 0 10px;
   border-radius: 18px;
   transition: color 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
 
-.tab-item.active       { color: var(--accent); }
-.tab-item.active svg   { stroke: var(--accent); }
+/* Colour stays the same on active — indicator does the work */
+.tab-item.active     { color: #0D2818; }
+.tab-item.active svg { stroke: #0D2818; }
 
-/* + button: never change its own colour on active */
-.tab-add.active        { color: var(--text-light); }
-.tab-add.active svg    { stroke: white; }          /* keep + icon white on green */
+/* + button: circle is already dark — never override */
+.tab-add.active      { color: #0D2818; }
+.tab-add.active svg  { stroke: white; }
 
 /* ─── Sliding active indicator bar ───────────────────────── */
 .tab-item::after {
   content: '';
   position: absolute;
-  bottom: 5px;
+  bottom: 0;                     /* flush with bottom edge of tab bar */
   left: 50%;
-  width: 20px;
+  width: 16px;                   /* matches design spec */
   height: 3px;
-  background: #5ABF7C;           /* lighter green — distinct from dark icon colour */
-  border-radius: 99px;
+  background: #0CE97E;           /* exact colour from design spec */
+  border-radius: 3px 3px 0 0;   /* only top corners rounded */
   transform: translateX(-50%) scaleX(0);
   opacity: 0;
   transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1),
@@ -332,19 +337,18 @@ body {
   opacity: 1;
 }
 
-/* Center + button */
-.tab-add { flex: 0 0 52px; }
+/* Center + button — 36px inline circle, matches Figma exactly */
+.tab-add { flex: 0 0 64px; }
 
 .tab-add-circle {
-  width: 44px;
-  height: 44px;
-  background: var(--accent);
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  background: #0D2818;           /* near-black dark green from Figma */
+  border-radius: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 10px rgba(29,93,59,0.4);
-  transform: translateY(-6px);   /* float slightly above bar */
+  /* no elevation — sits flat inside the bar */
 }
 .back-btn {
   position: absolute;
