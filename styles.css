@@ -15,15 +15,14 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-               Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
   background: var(--bg);
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
-  /* space for fixed header + fixed tab bar */
   padding-top: var(--header-h);
   padding-bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom, 0px));
 }
@@ -41,22 +40,15 @@ body {
   border-bottom: 1px solid #EEE;
   z-index: 40;
 }
-
-.app-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  flex-shrink: 0;
-}
-
-.app-title   { font-size: 20px; font-weight: 700; line-height: 1.1; }
-.app-tagline { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+.app-logo   { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; }
+.app-title  { font-size: 20px; font-weight: 700; line-height: 1.1; }
+.app-tagline{ font-size: 11px; color: var(--text-light); margin-top: 1px; }
 
 /* ─── Views ───────────────────────────────────────────────── */
 .view { display: block; }
 .view[hidden] { display: none; }
 
-/* ─── Sticky search + filter bar ─────────────────────────── */
+/* ─── Sticky search + filters ─────────────────────────────── */
 .sticky-controls {
   position: sticky;
   top: var(--header-h);
@@ -64,7 +56,6 @@ body {
   background: var(--bg);
   padding-top: 12px;
 }
-
 .search-wrapper {
   display: flex;
   align-items: center;
@@ -75,9 +66,7 @@ body {
   padding: 10px 14px;
   margin: 0 20px 10px;
 }
-
 .search-icon { color: var(--text-light); flex-shrink: 0; }
-
 #search-input {
   flex: 1;
   border: none;
@@ -87,10 +76,7 @@ body {
   color: var(--text-dark);
   min-width: 0;
 }
-
 #search-input::placeholder { color: var(--text-light); }
-
-/* iOS clear button spacing */
 #search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ─── Category filter chips ───────────────────────────────── */
@@ -102,7 +88,6 @@ body {
   scrollbar-width: none;
 }
 .filters::-webkit-scrollbar { display: none; }
-
 .filter-btn {
   background: var(--card-bg);
   border: 1px solid #DDD;
@@ -114,18 +99,10 @@ body {
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.filter-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* ─── Seen-count banner ───────────────────────────────────── */
-.stats-container {
-  padding: 20px;
-  background: var(--card-bg);
-  margin-bottom: 10px;
-}
+.stats-container { padding: 20px; background: var(--card-bg); margin-bottom: 10px; }
 .stats-number { font-size: 32px; font-weight: bold; color: var(--accent); }
 .stats-text   { color: var(--text-light); font-size: 14px; }
 
@@ -137,7 +114,6 @@ body {
   gap: 10px;
   padding-bottom: 8px;
 }
-
 .animal-card {
   background: var(--card-bg);
   padding: 12px;
@@ -148,124 +124,202 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   cursor: pointer;
 }
+.animal-img { width: 50px; height: 50px; border-radius: 8px; background: #E0E0E0; object-fit: cover; flex-shrink: 0; }
+.animal-info { flex: 1; min-width: 0; }
+.animal-name { font-weight: 600; font-size: 15px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.animal-meta { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-.animal-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  background: #E0E0E0;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.animal-info  { flex: 1; min-width: 0; }
-.animal-name  { font-weight: 600; font-size: 15px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.animal-meta  { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-
-/* ─── Rarity badges ───────────────────────────────────────── */
-.rarity-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
-  white-space: nowrap;
-  line-height: 1.6;
-}
+/* ─── Rarity badges (in list) ────────────────────────────── */
+.rarity-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; line-height: 1.6; }
 .rarity-Common   { background: #E8F5E9; color: #2E7D32; }
 .rarity-Uncommon { background: #FFF3E0; color: #E65100; }
 .rarity-Rare     { background: #FCE4EC; color: #C62828; }
 
 /* ─── Check icon ──────────────────────────────────────────── */
-.check-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2px solid #DDD;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: pointer;
-  font-size: 13px;
-  background: none;
-  transition: background 0.15s, border-color 0.15s;
-}
+.check-icon { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #DDD; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; font-size: 13px; background: none; transition: background 0.15s, border-color 0.15s; }
 .check-icon.seen { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-/* ─── Empty state ─────────────────────────────────────────── */
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
 
 /* ─── Bottom tab bar ──────────────────────────────────────── */
 .tab-bar {
   position: fixed;
   bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  left: 16px;
-  right: 16px;
-  height: var(--tabbar-h);                       /* 64px */
-  background: rgba(255, 255, 255, 0.65);         /* frosted glass */
+  left: 16px; right: 16px;
+  height: var(--tabbar-h);
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(225, 225, 225, 0.35);   /* subtle outer ring */
-  border-radius: 24px;                            /* matches Figma 24px */
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(225, 225, 225, 0.35);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   display: flex;
   align-items: center;
-  justify-content: space-between;                /* matches Figma */
-  padding: 0 16px;                               /* matches Figma nav padding */
+  justify-content: space-between;
+  padding: 0 16px;
   z-index: 40;
 }
+.tab-item {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0D2818;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  padding: 5px 0 10px;
+  border-radius: 18px;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-item.active     { color: #0D2818; }
+.tab-item.active svg { stroke: #0D2818; }
+.tab-add.active      { color: #0D2818; }
+.tab-add.active svg  { stroke: white; }
 
-/* Center + button — defined above in tab-item section */
+/* Active indicator bar */
+.tab-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 16px; height: 3px;
+  background: #0CE97E;
+  border-radius: 3px 3px 0 0;
+  transform: translateX(-50%) scaleX(0);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.2s ease;
+}
+.tab-item.active::after { transform: translateX(-50%) scaleX(1); opacity: 1; }
 
-/* ─── Detail modal ────────────────────────────────────────── */
+.tab-add { flex: 0 0 64px; }
+.tab-add-circle {
+  width: 36px; height: 36px;
+  background: #0D2818;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Dev pages ───────────────────────────────────────────── */
+.dev-page {
+  min-height: calc(100vh - var(--header-h) - var(--tabbar-h) - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dev-page[hidden] { display: none; }
+.dev-content { text-align: center; padding: 40px 32px; max-width: 320px; }
+.dev-content svg  { margin-bottom: 20px; opacity: 0.7; }
+.dev-content h2   { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.dev-content p    { color: var(--text-light); font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+.dev-badge { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 6px 16px; border-radius: 20px; }
+
+/* ─── Modal (slides in from right) ───────────────────────── */
 .modal {
   position: fixed;
   inset: 0;
-  background: var(--card-bg);
+  background: #FFFFFF;
   z-index: 100;
-  transform: translateX(100%);       /* slides in from right */
+  transform: translateX(100%);
   transition: transform 0.28s ease;
   overflow-y: auto;
   overflow-x: hidden;
   will-change: transform;
+  -webkit-overflow-scrolling: touch;
 }
-
 .modal.active { transform: translateX(0); }
 
-/* dim the content behind while modal is open */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 99;
+/* ─── Detail navigation bar ───────────────────────────────── */
+.detail-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  transition: background 0.25s ease, backdrop-filter 0.25s ease;
+}
+.detail-nav.scrolled {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.detail-nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F3F3F3;
   opacity: 0;
+  transition: opacity 0.2s ease, color 0.25s ease;
   pointer-events: none;
-  transition: opacity 0.28s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
+  text-align: center;
 }
-.modal-backdrop.active { opacity: 1; pointer-events: auto; }
+.detail-nav.scrolled .detail-nav-title { opacity: 1; color: #121717; }
+.detail-nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #F3F3F3;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s, color 0.2s;
+}
+.detail-nav.scrolled .detail-nav-btn { background: rgba(0,0,0,0.05); color: #121717; }
 
-.modal-header-img {
-  width: 100%;
-  height: 260px;
-  background: #DDD;
+/* ─── Hero image ──────────────────────────────────────────── */
+.detail-hero {
   position: relative;
+  margin-top: -56px;                  /* extend behind sticky nav */
+  height: calc(55vh + 56px);         /* compensate for the pull-up */
+  background: #BBBBBB;
   background-size: cover;
   background-position: center 20%;
   cursor: zoom-in;
+  flex-shrink: 0;
 }
-
-.modal-header-img {
-  width: 100%;
-  height: 260px;
-  background: #DDD;
-  position: relative;
-  background-size: cover;
-  background-position: center 20%;
-  cursor: zoom-in;
+.hero-gradient-top {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 154px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 78%);
+  pointer-events: none;
 }
-
-/* ─── Expand button (Material Symbol) ────────────────────── */
+.hero-gradient-bottom {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 96px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 78%);
+  pointer-events: none;
+}
+.hero-animal-name {
+  position: absolute;
+  bottom: 36px;
+  left: 24px;
+  right: 24px;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #FFFFFF;
+  pointer-events: none;
+}
 .expand-btn {
   position: absolute;
   bottom: 12px; right: 12px;
@@ -280,159 +334,148 @@ body {
   color: #fff;
   -webkit-tap-highlight-color: transparent;
 }
+.expand-btn .material-symbols-outlined { font-size: 20px; line-height: 1; }
 
-.expand-btn .material-symbols-outlined {
-  font-size: 20px;
-  line-height: 1;
+/* ─── Content card ────────────────────────────────────────── */
+.detail-card {
+  background: #FFFFFF;
+  border-radius: 16px 16px 0 0;
+  margin-top: -20px;
+  min-height: 60vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ─── Tab item ────────────────────────────────────────────── */
-.tab-item {
+/* ─── Status chips ────────────────────────────────────────── */
+.chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.1px;
+  border: none;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* Seen chip (interactive) */
+.chip-seen-btn {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  /* Default = not seen state */
+  background: transparent;
+  border: 1px solid #CAC4D0;
+  color: #1D1B20;
+}
+.chip-seen-btn.is-seen {
+  background: #CFF7D3;
+  border-color: transparent;
+  color: #045B28;
+}
+
+/* Rarity chip */
+.chip-rarity { border: 1px solid #CAC4D0; color: #1D1B20; background: transparent; }
+
+/* Conservation chips (hidden for LC/DD) */
+#modal-conservation-chip[hidden] { display: none !important; }
+.chip-con-NT { background: #F0F0F0; color: #5E7A87; }
+.chip-con-VU { background: #FFF1C2; color: #975102; }
+.chip-con-EN { background: #FFE8DC; color: #C04A00; }
+.chip-con-CR { background: #FFE0E0; color: #B91C1C; }
+
+/* ─── Description ─────────────────────────────────────────── */
+.detail-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1E1E1E;
+  padding: 8px 0;
+}
+
+/* ─── Stats horizontal scroll ─────────────────────────────── */
+.stats-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  scrollbar-width: none;
+  margin: 0 -4px;
+  padding-left: 4px;
+}
+.stats-scroll::-webkit-scrollbar { display: none; }
+
+.stat-card {
+  flex-shrink: 0;
+  width: 304px;
+  border: 1px solid #F3F3F3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stat-row { display: flex; }
+.stat-row-border .stat-cell { border-top: 1px solid #E6E8EB; }
+
+.stat-cell {
   flex: 1;
-  position: relative;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-cell-right {
+  border-left: 1px solid #E6E8EB;
+  padding-left: 16px;
+}
+.stat-label-sm { font-size: 14px; font-weight: 600; color: #757575; line-height: 1.4; }
+.stat-value-lg { font-size: 16px; color: #0D171C; line-height: 1.4; }
+
+/* ─── Sections ────────────────────────────────────────────── */
+.detail-section { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
+.detail-section-last { padding-bottom: 8px; }
+
+.section-heading {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  padding-top: 4px;
+}
+.section-body { font-size: 16px; line-height: 1.6; color: #1E1E1E; }
+
+/* ─── Habitat chips ───────────────────────────────────────── */
+.habitat-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.habitat-chips::-webkit-scrollbar { display: none; }
+.habitat-chip { padding: 6px 16px; border-radius: 8px; border: 1px solid #CAC4D0; font-size: 14px; color: #1D1B20; white-space: nowrap; }
+
+/* ─── Places list ─────────────────────────────────────────── */
+.places-list { display: flex; flex-direction: column; }
+.place-item { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
+.place-icon { width: 48px; height: 48px; background: #EBEDF0; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #121717; }
+.place-info { flex: 1; min-width: 0; }
+.place-name-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 3px; }
+.place-name { font-size: 16px; color: #121717; font-weight: 400; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.place-detail { font-size: 14px; color: #5E7A87; }
+
+/* ─── Experiences empty state ─────────────────────────────── */
+.experiences-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #0D2818;                  /* Figma label/icon colour */
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  padding: 5px 0 10px;
-  border-radius: 18px;
-  transition: color 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Colour stays the same on active — indicator does the work */
-.tab-item.active     { color: #0D2818; }
-.tab-item.active svg { stroke: #0D2818; }
-
-/* + button: circle is already dark — never override */
-.tab-add.active      { color: #0D2818; }
-.tab-add.active svg  { stroke: white; }
-
-/* ─── Sliding active indicator bar ───────────────────────── */
-.tab-item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;                     /* flush with bottom edge of tab bar */
-  left: 50%;
-  width: 16px;                   /* matches design spec */
-  height: 3px;
-  background: #0CE97E;           /* exact colour from design spec */
-  border-radius: 3px 3px 0 0;   /* only top corners rounded */
-  transform: translateX(-50%) scaleX(0);
-  opacity: 0;
-  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1),
-              opacity   0.2s ease;
-}
-
-.tab-item.active::after {
-  transform: translateX(-50%) scaleX(1);
-  opacity: 1;
-}
-
-/* Center + button — 36px inline circle, matches Figma exactly */
-.tab-add { flex: 0 0 64px; }
-
-.tab-add-circle {
-  width: 36px;
-  height: 36px;
-  background: #0D2818;           /* near-black dark green from Figma */
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* no elevation — sits flat inside the bar */
-}
-.back-btn {
-  position: absolute;
-  top: 16px; left: 16px;
-  background: rgba(255,255,255,0.88);
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.modal-content { padding: 20px; }
-
-.modal-title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
-}
-
-.modal-title    { font-size: 26px; font-weight: bold; flex: 1; }
-.modal-scientific { color: var(--text-light); font-style: italic; margin-bottom: 20px; }
-
-.action-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-
-.btn-seen {
-  flex: 1;
-  background: var(--accent-light);
-  color: var(--accent);
-  font-weight: bold;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: 1px solid var(--accent);
+  padding: 24px 0;
+  color: #757575;
   font-size: 15px;
-  transition: background 0.15s, color 0.15s;
-}
-.btn-seen.is-seen { background: var(--accent); color: #fff; }
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.stat-box   { background: var(--bg); padding: 12px; border-radius: 8px; }
-.stat-label { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
-.stat-value { font-weight: 600; font-size: 14px; }
-
-.description { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
-
-/* ─── Dev pages ───────────────────────────────────────────── */
-.dev-page {
-  min-height: calc(100vh - var(--header-h) - var(--tabbar-h) - 48px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.dev-page[hidden] { display: none; }
-
-.dev-content {
   text-align: center;
-  padding: 40px 32px;
-  max-width: 320px;
-}
-.dev-content svg  { margin-bottom: 20px; opacity: 0.7; }
-.dev-content h2   { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-.dev-content p    { color: var(--text-light); font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
-
-.dev-badge {
-  display: inline-block;
-  background: var(--accent-light);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 6px 16px;
-  border-radius: 20px;
+  line-height: 1.6;
 }
 
 /* ─── Lightbox ────────────────────────────────────────────── */
@@ -448,22 +491,10 @@ body {
   animation: lb-in 0.2s ease;
 }
 .lightbox[hidden] { display: none; }
-
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
-
 .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+.lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 22px; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-.lightbox-close {
-  position: absolute;
-  top: 16px; right: 16px;
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ─── Modal backdrop ──────────────────────────────────────── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+.modal-backdrop.active { opacity: 1; pointer-events: auto; }
