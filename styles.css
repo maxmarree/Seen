@@ -24,7 +24,7 @@ body {
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
   padding-top: var(--header-h);
-  padding-bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ─── Fixed header ────────────────────────────────────────── */
@@ -143,7 +143,7 @@ body {
 /* ─── Bottom tab bar ──────────────────────────────────────── */
 .tab-bar {
   position: fixed;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   left: 16px; right: 16px;
   height: var(--tabbar-h);
   background: rgba(255, 255, 255, 0.65);
