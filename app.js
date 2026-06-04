@@ -1,8 +1,14 @@
 // ─── State ────────────────────────────────────────────────────
 let seenList        = JSON.parse(localStorage.getItem('seenAnimals')) || [];
+let seenDates       = JSON.parse(localStorage.getItem('seenDates'))   || {};   // id → 'YYYY-MM-DD'
 let activeAnimalId  = null;
 let searchQuery     = '';
+let seenSearchQuery = '';
+let activeTab       = 'animals';
 let navScrollHandler = null;
+
+const HEADER_H = 64;                       // matches --header-h
+const todayStr = () => new Date().toISOString().slice(0, 10);
 
 // Animals-view navigation state
 const animalsNav = {
@@ -13,7 +19,7 @@ const animalsNav = {
 
 // ─── Category definitions ─────────────────────────────────────
 const CATEGORY_META = [
-  { id:'Mammals',    emoji:'🦁', label:'Mammals'    },
+  { id:'Mammals',    emoji:'🐺', label:'Mammals'    },
   { id:'Fish',       emoji:'🐟', label:'Fish'       },
   { id:'Reptiles',   emoji:'🦎', label:'Reptiles'   },
   { id:'Birds',      emoji:'🐦', label:'Birds'      },
@@ -216,10 +222,11 @@ function showAnimalsLanding() {
   document.getElementById('animals-category').hidden = true;
   document.getElementById('animals-search').hidden   = true;
 
-  document.getElementById('header-brand').hidden = false;
-  document.getElementById('header-nav').hidden   = true;
+  document.getElementById('animals-large-title').textContent = 'Animals';
 
   renderCategoryGrid();
+  syncHeader();
+  onScroll();
 }
 
 function showAnimalsCategory(category) {
@@ -227,19 +234,19 @@ function showAnimalsCategory(category) {
   animalsNav.category = category;
   animalsNav.subCategory = 'All';
   // Keep any existing search query — it will filter within the category
-  const inp = document.getElementById('search-input');
-  inp.placeholder = `Search ${category}…`;
+  document.getElementById('search-input').placeholder = `Search ${category}…`;
 
   document.getElementById('animals-landing').hidden  = true;
   document.getElementById('animals-category').hidden = false;
   document.getElementById('animals-search').hidden   = true;
 
-  document.getElementById('header-brand').hidden       = true;
-  document.getElementById('header-nav').hidden         = false;
-  document.getElementById('header-nav-title').textContent = category;
+  document.getElementById('animals-large-title').textContent = category;
 
   renderSubcategoryFilters(category);
   renderAnimalList();
+  window.scrollTo(0, 0);
+  syncHeader();
+  onScroll();
 }
 
 function showAnimalsSearch() {
@@ -249,16 +256,24 @@ function showAnimalsSearch() {
   document.getElementById('animals-category').hidden = true;
   document.getElementById('animals-search').hidden   = false;
 
-  document.getElementById('header-brand').hidden = false;
-  document.getElementById('header-nav').hidden   = true;
-
   renderSearchResults();
+  syncHeader();
+  onScroll();
 }
 
 // ─── Seen toggle ──────────────────────────────────────────────
 function toggleSeen(id) {
-  seenList = seenList.includes(id) ? seenList.filter(i => i !== id) : [...seenList, id];
+  const wasSeen = seenList.includes(id);
+  if (wasSeen) {
+    seenList = seenList.filter(i => i !== id);
+    delete seenDates[id];
+  } else {
+    seenList = [...seenList, id];
+    seenDates[id] = todayStr();
+  }
   localStorage.setItem('seenAnimals', JSON.stringify(seenList));
+  localStorage.setItem('seenDates',   JSON.stringify(seenDates));
+
   const isSeen = seenList.includes(id);
   const btn = document.querySelector(`[data-toggle="${id}"]`);
   if (btn) { btn.classList.toggle('seen', isSeen); btn.textContent = isSeen ? '✓' : ''; btn.ariaLabel = isSeen ? 'Mark unseen' : 'Mark as seen'; }
@@ -269,28 +284,98 @@ function toggleSeen(id) {
 
 // ─── Seen list view ───────────────────────────────────────────
 function renderSeenList() {
-  const container   = document.getElementById('seen-list');
-  const seenAnimals = animals.filter(a => seenList.includes(a.id));
-  if (!seenAnimals.length) { container.innerHTML = '<div class="empty-state">No animals seen yet. Go explore!</div>'; return; }
+  const container = document.getElementById('seen-list');
+  let seenAnimals = animals.filter(a => seenList.includes(a.id));
+  if (seenSearchQuery) {
+    const q = seenSearchQuery.toLowerCase();
+    seenAnimals = seenAnimals.filter(a =>
+      a.commonName.toLowerCase().includes(q) ||
+      a.scientificName.toLowerCase().includes(q)
+    );
+  }
+  if (!seenAnimals.length) {
+    container.innerHTML = seenSearchQuery
+      ? `<div class="empty-state">No seen animals match "${seenSearchQuery}"</div>`
+      : '<div class="empty-state">No animals seen yet. Go explore!</div>';
+    return;
+  }
   container.innerHTML = seenAnimals.map(createCardHTML).join('');
   loadImages(seenAnimals);
 }
 
 function updateSeenCount() {
-  document.getElementById('seen-count').textContent = `${seenList.length} / ${animals.length}`;
+  document.getElementById('seen-count').textContent = seenList.length;
+  const t = todayStr();
+  const todayN = Object.values(seenDates).filter(d => d === t).length;
+  const todayEl      = document.getElementById('seen-today');
+  const todayCountEl = document.getElementById('seen-today-count');
+  if (todayEl && todayCountEl) {
+    todayCountEl.textContent = todayN;
+    todayEl.hidden = todayN === 0;
+  }
+}
+
+// ─── App header (iOS large-title pattern) ─────────────────────
+// Sets the collapsed title text, back button, and action icons
+// for the current tab/level. The large title in the page content
+// fades into this bar on scroll (see onScroll).
+function syncHeader() {
+  const back  = document.getElementById('app-header-back');
+  const right = document.getElementById('app-header-right');
+  const title = document.getElementById('app-header-title');
+
+  let titleText = '', showBack = false, showActions = false;
+
+  if (activeTab === 'animals') {
+    showActions = true;
+    if (animalsNav.level === 'category') { titleText = animalsNav.category; showBack = true; }
+    else                                 { titleText = 'Animals'; }
+  } else if (activeTab === 'seen') {
+    titleText = 'Seen';
+  } else {
+    titleText = { today: 'Today', places: 'Places', add: 'Log a Sighting' }[activeTab] || '';
+  }
+
+  title.textContent = titleText;
+  back.hidden  = !showBack;
+  right.hidden = !showActions;
+}
+
+// Collapse / reveal the large title as the page scrolls.
+function getCollapseAnchor() {
+  if (activeTab === 'animals') return document.getElementById('animals-large-title');
+  if (activeTab === 'seen')    return document.getElementById('seen-count');
+  return null;                                  // dev pages have no large title
+}
+
+function onScroll() {
+  const header = document.getElementById('app-header');
+  const anchor = getCollapseAnchor();
+  if (!anchor) {                                // dev pages → always show the title
+    header.classList.add('force-title');
+    header.classList.remove('scrolled');
+    return;
+  }
+  header.classList.remove('force-title');
+  const bottom = anchor.getBoundingClientRect().bottom;
+  header.classList.toggle('scrolled', bottom <= HEADER_H + 4);
 }
 
 // ─── Tab switching ────────────────────────────────────────────
 const ALL_VIEWS = ['animals-view','seen-view','today-view','places-view','add-view'];
 
 function switchTab(tab) {
+  closeAllSheets();                              // dismiss any open sheet on tab change
+  activeTab = tab;
   ALL_VIEWS.forEach(v => { const el = document.getElementById(v); if (el) el.hidden = (v !== `${tab}-view`); });
   document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  if (tab === 'animals') {
-    // Return to landing when switching back to Animals tab
-    showAnimalsLanding();
-  }
-  if (tab === 'seen') renderSeenList();
+
+  if (tab === 'animals') showAnimalsLanding();   // resets to landing + header
+  if (tab === 'seen')    renderSeenList();
+
+  window.scrollTo(0, 0);
+  syncHeader();
+  onScroll();
 }
 
 // ─── Detail modal ─────────────────────────────────────────────
@@ -435,11 +520,35 @@ modal.addEventListener('touchend', e => {
   isSwiping = false;
 }, { passive: true });
 
+// ─── Bottom sheets (filter + settings) ───────────────────────
+function openSheet(id) {
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).setAttribute('aria-hidden', 'false');
+  document.getElementById('sheet-backdrop').classList.add('active');
+}
+
+function closeAllSheets() {
+  document.querySelectorAll('.bottom-sheet.active').forEach(s => {
+    s.classList.remove('active');
+    s.setAttribute('aria-hidden', 'true');
+  });
+  document.getElementById('sheet-backdrop').classList.remove('active');
+}
+
 // ─── Event delegation ─────────────────────────────────────────
 document.addEventListener('click', e => {
   // Tab bar
   const tabItem = e.target.closest('.tab-item');
   if (tabItem?.dataset.tab) { switchTab(tabItem.dataset.tab); return; }
+
+  // Header action buttons
+  if (e.target.closest('#header-filter-btn'))   { openSheet('filter-sheet');   return; }
+  if (e.target.closest('#header-settings-btn')) { openSheet('settings-sheet'); return; }
+
+  // Sheet close controls
+  if (e.target.closest('#filter-sheet-close'))   { closeAllSheets(); return; }
+  if (e.target.closest('#settings-sheet-close')) { closeAllSheets(); return; }
+  if (e.target.closest('#sheet-backdrop'))        { closeAllSheets(); return; }
 
   // Category card (landing page)
   const catCard = e.target.closest('.category-card');
@@ -449,8 +558,8 @@ document.addEventListener('click', e => {
   const subcat = e.target.closest('[data-subcat]');
   if (subcat) { animalsNav.subCategory = subcat.dataset.subcat; renderSubcategoryFilters(animalsNav.category); renderAnimalList(); return; }
 
-  // Back button in animals header
-  if (e.target.closest('#animals-back-btn')) { showAnimalsLanding(); return; }
+  // Back button in app header
+  if (e.target.closest('#app-header-back')) { showAnimalsLanding(); return; }
 
   // Seen toggle on card
   const toggle = e.target.closest('[data-toggle]');
@@ -490,9 +599,19 @@ document.getElementById('search-input').addEventListener('input', e => {
   }
 });
 
+// Seen-tab search — filters the seen list only
+const seenSearchEl = document.getElementById('seen-search-input');
+if (seenSearchEl) {
+  seenSearchEl.addEventListener('input', e => {
+    seenSearchQuery = e.target.value.trim();
+    renderSeenList();
+  });
+}
+
 // Keyboard
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (document.querySelector('.bottom-sheet.active')) { closeAllSheets(); return; }
     if (!document.getElementById('lightbox').hidden) { closeLightbox(); return; }
     if (activeAnimalId) closeModal();
   }
@@ -507,8 +626,14 @@ function init() {
   const seenIcon = document.querySelector('#modal-seen-btn svg');
   if (seenIcon) seenIcon.style.display = 'none';
 
+  // Collapse the large title into the header on scroll
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  activeTab = 'animals';
   showAnimalsLanding();
   updateSeenCount();
+  syncHeader();
+  onScroll();
 }
 
 init();

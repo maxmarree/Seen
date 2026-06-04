@@ -16,28 +16,34 @@
 </head>
 <body>
 
-  <!-- ── Adaptive header ──────────────────────────────────────── -->
-  <header class="header" id="main-header">
-    <!-- Landing state: brand logo -->
-    <div class="header-brand" id="header-brand">
-      <img src="icon.png" class="app-logo" alt="Seen" />
-      <div>
-        <div class="app-title">Seen</div>
-        <div class="app-tagline">Brazil Wildlife Tracker</div>
-      </div>
-    </div>
-    <!-- Category state: back + title -->
-    <div class="header-nav" id="header-nav" hidden>
-      <button class="header-back-btn" id="animals-back-btn" aria-label="Back to Animals">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+  <!-- ── iOS-style header bar ─────────────────────────────────── -->
+  <!-- Holds: back button (left), collapsed title (centre, on scroll),
+       filter + settings actions (right). The LARGE title lives in
+       each view's content and collapses into this bar on scroll.   -->
+  <header class="app-header" id="app-header">
+    <div class="app-header-left">
+      <button class="app-header-back" id="app-header-back" aria-label="Back" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <span class="header-nav-title" id="header-nav-title"></span>
-      <div class="header-nav-spacer"></div>
+    </div>
+    <h2 class="app-header-title" id="app-header-title"></h2>
+    <div class="app-header-right" id="app-header-right">
+      <button class="app-header-icon" id="header-filter-btn" aria-label="Filter">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </button>
+      <button class="app-header-icon" id="header-settings-btn" aria-label="Settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
   </header>
 
   <!-- ── Animals view ─────────────────────────────────────────── -->
   <div id="animals-view" class="view">
+
+    <!-- Large title (collapses into header on scroll) -->
+    <div class="large-title-row">
+      <h1 class="large-title" id="animals-large-title">Animals</h1>
+    </div>
 
     <!-- Persistent sticky search — stays visible at all Animals levels -->
     <div class="animals-search-sticky">
@@ -47,10 +53,9 @@
       </div>
     </div>
 
-    <!-- Level 1: Landing page (big title + category grid) -->
+    <!-- Level 1: Landing page (category grid) -->
     <div id="animals-landing">
       <div class="landing-content">
-        <h1 class="landing-title">Animals</h1>
         <div class="category-grid" id="category-grid"></div>
       </div>
     </div>
@@ -73,10 +78,27 @@
 
   <!-- ── Seen view ─────────────────────────────────────────────── -->
   <div id="seen-view" class="view" hidden>
-    <div class="stats-container">
-      <div class="stats-number" id="seen-count">0</div>
-      <div class="stats-text">Animals Seen in Brazil</div>
+
+    <!-- Large title: seen count + label (collapses to "Seen" on scroll) -->
+    <div class="large-title-row seen-hero-row">
+      <div class="seen-hero-top">
+        <span class="seen-hero-number" id="seen-count">0</span>
+        <span class="seen-hero-today" id="seen-today" hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B05B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
+          <span id="seen-today-count">0</span>&nbsp;Today
+        </span>
+      </div>
+      <div class="seen-hero-label">Animals seen</div>
     </div>
+
+    <!-- Sticky search for the seen list -->
+    <div class="animals-search-sticky">
+      <div class="search-wrapper animals-search-inner">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="seen-search-input" placeholder="Search animals you've seen…" autocomplete="off" />
+      </div>
+    </div>
+
     <div class="list-container" id="seen-list"></div>
   </div>
 
@@ -200,6 +222,86 @@
       <span>Places</span>
     </button>
   </nav>
+
+  <!-- ── Filter bottom sheet ──────────────────────────────────── -->
+  <div class="bottom-sheet" id="filter-sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Filter</h2>
+      <button class="sheet-close-btn" id="filter-sheet-close" aria-label="Close filter">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p class="sheet-section-label">Country</p>
+      <div class="country-row">
+        <span class="country-flag">🇧🇷</span>
+        <span class="country-name">Brazil</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D2818" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="sheet-coming-soon">More countries coming soon — Colombia, Ecuador, Peru & Bolivia.</p>
+    </div>
+  </div>
+
+  <!-- ── Settings bottom sheet ─────────────────────────────────── -->
+  <div class="bottom-sheet" id="settings-sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Settings</h2>
+      <button class="sheet-close-btn" id="settings-sheet-close" aria-label="Close settings">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="settings-app-block">
+        <img src="icon.png" class="settings-app-icon" alt="Seen" />
+        <div class="settings-app-name">Seen</div>
+        <div class="settings-app-sub">Brazil Wildlife Tracker · v0.1 Beta</div>
+      </div>
+      <div class="settings-dev-banner">
+        <span>🚧</span>
+        <div>
+          <div class="settings-dev-title">In Development</div>
+          <div class="settings-dev-body">Seen is being actively built. New countries, social features, and offline mode are on their way.</div>
+        </div>
+      </div>
+      <p class="sheet-section-label" style="margin-top:20px">Coming soon</p>
+      <div class="settings-rows">
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Notifications</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export sightings</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Community sightings</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>More countries</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+      </div>
+      <p class="settings-footer">Built for wildlife enthusiasts exploring Brazil's Pantanal, Bonito &amp; Rio de Janeiro.</p>
+    </div>
+  </div>
+
+  <!-- ── Shared sheet backdrop ──────────────────────────────────── -->
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
 
   <script src="rarity.js"></script>
   <script src="conservation.js"></script>
