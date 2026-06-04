@@ -220,7 +220,22 @@ function renderSearchResults() {
 }
 
 // ─── Animals-view navigation ──────────────────────────────────
-function showAnimalsLanding() {
+// animate=true: slide the category overlay out before resetting state
+function showAnimalsLanding(animate = false) {
+  const catEl = document.getElementById('animals-category');
+
+  if (animate && catEl.classList.contains('page-active')) {
+    catEl.style.transition = 'transform 0.26s ease';
+    catEl.style.transform  = 'translateX(100%)';
+    catEl.addEventListener('transitionend', () => {
+      catEl.classList.remove('page-active');
+      catEl.style.transition = '';
+      catEl.style.transform  = '';
+    }, { once: true });
+  } else {
+    catEl.classList.remove('page-active');
+  }
+
   animalsNav.level = 'landing';
   animalsNav.category = null;
   animalsNav.subCategory = 'All';
@@ -229,10 +244,8 @@ function showAnimalsLanding() {
   inp.value       = '';
   inp.placeholder = 'Search all animals…';
 
-  document.getElementById('animals-landing').hidden  = false;
-  document.getElementById('animals-category').hidden = true;
-  document.getElementById('animals-search').hidden   = true;
-
+  document.getElementById('animals-landing').hidden = false;
+  document.getElementById('animals-search').hidden  = true;
   document.getElementById('animals-large-title').textContent = 'Animals';
 
   renderCategoryGrid();
@@ -244,44 +257,52 @@ function showAnimalsCategory(category) {
   animalsNav.level = 'category';
   animalsNav.category = category;
   animalsNav.subCategory = 'All';
-  // Keep any existing search query — it will filter within the category
   document.getElementById('search-input').placeholder = `Search ${category}…`;
 
-  document.getElementById('animals-landing').hidden  = true;
-  document.getElementById('animals-category').hidden = false;
-  document.getElementById('animals-search').hidden   = true;
-
-  document.getElementById('animals-large-title').textContent = category;
-
+  document.getElementById('animals-cat-title').textContent = category;
   renderSubcategoryFilters(category);
   renderAnimalList();
-  window.scrollTo(0, 0);
+
+  // Slide the overlay in from the right
+  const el = document.getElementById('animals-category');
+  el.scrollTop = 0;
+  el.classList.add('page-active');
+
   syncHeader();
   onScroll();
 }
 
 function showAnimalsSearch() {
   animalsNav.level = 'search';
-
-  document.getElementById('animals-landing').hidden  = true;
-  document.getElementById('animals-category').hidden = true;
-  document.getElementById('animals-search').hidden   = false;
-
+  document.getElementById('animals-category').classList.remove('page-active');
+  document.getElementById('animals-landing').hidden = true;
+  document.getElementById('animals-search').hidden  = false;
   renderSearchResults();
   syncHeader();
   onScroll();
 }
 
 // ─── Seen navigation ──────────────────────────────────────────
-function showSeenAll() {
+function showSeenAll(animate = false) {
+  const catEl = document.getElementById('seen-category');
+
+  if (animate && catEl.classList.contains('page-active')) {
+    catEl.style.transition = 'transform 0.26s ease';
+    catEl.style.transform  = 'translateX(100%)';
+    catEl.addEventListener('transitionend', () => {
+      catEl.classList.remove('page-active');
+      catEl.style.transition = '';
+      catEl.style.transform  = '';
+    }, { once: true });
+  } else {
+    catEl.classList.remove('page-active');
+  }
+
   seenNav.level    = 'all';
   seenNav.category = null;
   seenSearchQuery  = '';
   const inp = document.getElementById('seen-search-input');
   if (inp) inp.value = '';
-
-  document.getElementById('seen-all').hidden      = false;
-  document.getElementById('seen-category').hidden = true;
 
   renderSeenChips();
   renderSeenList();
@@ -294,18 +315,24 @@ function showSeenCategory(cat) {
   seenNav.level    = 'category';
   seenNav.category = cat;
 
-  document.getElementById('seen-all').hidden      = true;
-  document.getElementById('seen-category').hidden = false;
-
-  const catTotal  = animals.filter(a => a.mainCategory === cat).length;
-  const catSeen   = animals.filter(a => seenList.includes(a.id) && a.mainCategory === cat);
-  const pct       = catTotal > 0 ? Math.round(catSeen.length / catTotal * 100) : 0;
+  const catTotal = animals.filter(a => a.mainCategory === cat).length;
+  const catSeen  = animals.filter(a => seenList.includes(a.id) && a.mainCategory === cat);
+  const pct      = catTotal > 0 ? Math.round(catSeen.length / catTotal * 100) : 0;
 
   document.getElementById('seen-cat-count').textContent = catSeen.length;
   document.getElementById('seen-cat-label').textContent = `${cat} seen`;
   document.getElementById('seen-fill-cat').style.width  = pct + '%';
   document.getElementById('seen-label-cat').textContent =
     `${catSeen.length} of ${catTotal} species · ${pct}%`;
+
+  // Today count for this specific category
+  const t        = todayStr();
+  const catToday = Object.entries(seenDates)
+    .filter(([id, date]) => date === t && animals.find(x => x.id === id)?.mainCategory === cat)
+    .length;
+  const todayEl      = document.getElementById('seen-cat-today');
+  const todayCountEl = document.getElementById('seen-cat-today-count');
+  if (todayEl && todayCountEl) { todayCountEl.textContent = catToday; todayEl.hidden = catToday === 0; }
 
   const container = document.getElementById('seen-cat-list');
   const emoji = CATEGORY_META.find(c => c.id === cat)?.emoji ?? '';
@@ -314,10 +341,15 @@ function showSeenCategory(cat) {
     : `<div class="empty-state">No ${emoji} ${cat.toLowerCase()} seen yet.<br/>Go explore!</div>`;
   loadImages(catSeen);
 
-  window.scrollTo(0, 0);
+  // Slide the overlay in
+  const el = document.getElementById('seen-category');
+  el.scrollTop = 0;
+  el.classList.add('page-active');
+
   syncHeader();
   onScroll();
 }
+
 
 // ─── Seen category chips ───────────────────────────────────────
 function renderSeenChips() {
@@ -455,7 +487,11 @@ function syncHeader() {
 
 // Collapse / reveal the large title as the page scrolls.
 function getCollapseAnchor() {
-  if (activeTab === 'animals') return document.getElementById('animals-large-title');
+  if (activeTab === 'animals') {
+    // Category overlay has its own large title; base landing uses the landing title
+    if (animalsNav.level === 'category') return document.getElementById('animals-cat-title');
+    return document.getElementById('animals-large-title');
+  }
   if (activeTab === 'seen') {
     if (seenNav.level === 'category') return document.getElementById('seen-cat-count');
     return document.getElementById('seen-count');
@@ -481,12 +517,15 @@ const ALL_VIEWS = ['animals-view','seen-view','today-view','places-view','add-vi
 
 function switchTab(tab) {
   closeAllSheets();
+  // Force-close all page overlays immediately (no animation on tab switch)
+  document.getElementById('animals-category').classList.remove('page-active');
+  document.getElementById('seen-category').classList.remove('page-active');
   activeTab = tab;
   ALL_VIEWS.forEach(v => { const el = document.getElementById(v); if (el) el.hidden = (v !== `${tab}-view`); });
   document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
 
-  if (tab === 'animals') showAnimalsLanding();   // resets to landing + header
-  if (tab === 'seen')    showSeenAll();           // always reset to level 0
+  if (tab === 'animals') showAnimalsLanding();
+  if (tab === 'seen')    showSeenAll();
 
   window.scrollTo(0, 0);
   syncHeader();
@@ -650,6 +689,55 @@ function closeAllSheets() {
   document.getElementById('sheet-backdrop').classList.remove('active');
 }
 
+// ─── iOS swipe-from-left-edge to go back (category pages) ─────
+// Mirrors the detail modal swipe but operates on the fixed category
+// overlays. Only fires when starting within 24 px of the left edge.
+let pgSwipeX = 0, pgSwipeY = 0, pgSwipeEl = null, pgSwiping = false;
+
+document.addEventListener('touchstart', e => {
+  if (e.touches[0].clientX > 24) return;              // left-edge only
+  if (document.getElementById('detail-modal').classList.contains('active')) return;
+  if (activeTab === 'animals' && animalsNav.level === 'category') {
+    pgSwipeEl = document.getElementById('animals-category');
+  } else if (activeTab === 'seen' && seenNav.level === 'category') {
+    pgSwipeEl = document.getElementById('seen-category');
+  } else { return; }
+  pgSwipeX = e.touches[0].clientX;
+  pgSwipeY = e.touches[0].clientY;
+  pgSwiping = false;
+  pgSwipeEl.style.transition = 'none';
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (!pgSwipeEl) return;
+  const dx = e.touches[0].clientX - pgSwipeX;
+  const dy = e.touches[0].clientY - pgSwipeY;
+  if (!pgSwiping && Math.abs(dx) > Math.abs(dy) && dx > 8) pgSwiping = true;
+  if (!pgSwiping) return;
+  pgSwipeEl.style.transform = `translateX(${Math.max(0, dx)}px)`;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!pgSwipeEl || !pgSwiping) { pgSwipeEl = null; return; }
+  const dx  = e.changedTouches[0].clientX - pgSwipeX;
+  const el  = pgSwipeEl;
+  pgSwipeEl = null; pgSwiping = false;
+  if (dx > 100) {
+    el.style.transition = 'transform 0.26s ease';
+    el.style.transform  = 'translateX(100%)';
+    el.addEventListener('transitionend', () => {
+      el.classList.remove('page-active');
+      el.style.transition = '';
+      el.style.transform  = '';
+      if      (activeTab === 'animals') showAnimalsLanding();
+      else if (activeTab === 'seen')    showSeenAll();
+    }, { once: true });
+  } else {
+    el.style.transition = 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
+    el.style.transform  = 'translateX(0)';
+  }
+}, { passive: true });
+
 // ─── Event delegation ─────────────────────────────────────────
 document.addEventListener('click', e => {
   // Tab bar
@@ -677,10 +765,10 @@ document.addEventListener('click', e => {
   const subcat = e.target.closest('[data-subcat]');
   if (subcat) { animalsNav.subCategory = subcat.dataset.subcat; renderSubcategoryFilters(animalsNav.category); renderAnimalList(); return; }
 
-  // Back button — Animals category → landing, Seen category → all
+  // Back button — Animals category → landing (animated), Seen category → all (animated)
   if (e.target.closest('#app-header-back')) {
-    if (activeTab === 'animals') { showAnimalsLanding(); return; }
-    if (activeTab === 'seen')    { showSeenAll();        return; }
+    if (activeTab === 'animals' && animalsNav.level === 'category') { showAnimalsLanding(true); return; }
+    if (activeTab === 'seen'    && seenNav.level    === 'category') { showSeenAll(true);        return; }
     return;
   }
 
@@ -751,6 +839,10 @@ function init() {
 
   // Collapse the large title into the header on scroll
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Collapse header when the fixed category overlays scroll (they don't fire window scroll)
+  document.getElementById('animals-category').addEventListener('scroll', onScroll, { passive: true });
+  document.getElementById('seen-category').addEventListener('scroll',    onScroll, { passive: true });
 
   activeTab = 'animals';
   showAnimalsLanding();

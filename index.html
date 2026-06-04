@@ -60,8 +60,11 @@
       </div>
     </div>
 
-    <!-- Level 2: Category animal list -->
-    <div id="animals-category" hidden>
+    <!-- Level 2: Category animal list — fixed overlay, slides in from right -->
+    <div id="animals-category">
+      <div class="large-title-row">
+        <h1 class="large-title" id="animals-cat-title">Animals</h1>
+      </div>
       <div class="sticky-controls sticky-controls-cats">
         <div class="filters" id="subcategory-filters"></div>
       </div>
@@ -114,13 +117,17 @@
       <div class="list-container" id="seen-list"></div>
     </div>
 
-    <!-- ── Level 1: Single category seen (e.g. Mammals) ────────── -->
-    <div id="seen-category" hidden>
+    <!-- ── Level 1: Single category seen — fixed overlay, slides in from right -->
+    <div id="seen-category">
 
-      <!-- Hero: category count + category label -->
+      <!-- Hero: category count + Today trend + category label -->
       <div class="large-title-row seen-hero-row">
         <div class="seen-hero-top">
           <span class="seen-hero-number" id="seen-cat-count">0</span>
+          <span class="seen-hero-today" id="seen-cat-today" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B05B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
+            <span id="seen-cat-today-count">0</span>&nbsp;Today
+          </span>
         </div>
         <div class="seen-hero-label" id="seen-cat-label">Mammals seen</div>
       </div>
