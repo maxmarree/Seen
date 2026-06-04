@@ -16,37 +16,127 @@
 </head>
 <body>
 
-  <!-- ── Fixed header ─────────────────────────────────────── -->
-  <header class="header">
-    <img src="icon.png" class="app-logo" alt="Seen" />
-    <div>
-      <div class="app-title">Seen</div>
-      <div class="app-tagline">Brazil Wildlife Tracker</div>
+  <!-- ── iOS-style header bar ─────────────────────────────────── -->
+  <!-- Holds: back button (left), collapsed title (centre, on scroll),
+       filter + settings actions (right). The LARGE title lives in
+       each view's content and collapses into this bar on scroll.   -->
+  <header class="app-header" id="app-header">
+    <div class="app-header-left">
+      <button class="app-header-back" id="app-header-back" aria-label="Back" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <h2 class="app-header-title" id="app-header-title"></h2>
+    <div class="app-header-right" id="app-header-right">
+      <button class="app-header-icon" id="header-filter-btn" aria-label="Filter">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </button>
+      <button class="app-header-icon" id="header-settings-btn" aria-label="Settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
   </header>
 
-  <!-- ── Animals view ─────────────────────────────────────── -->
+  <!-- ── Animals view ─────────────────────────────────────────── -->
   <div id="animals-view" class="view">
-    <div class="sticky-controls">
-      <div class="search-wrapper">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="search" id="search-input" placeholder="Search animals…" autocomplete="off" />
+
+    <!-- Large title (collapses into header on scroll) -->
+    <div class="large-title-row">
+      <h1 class="large-title" id="animals-large-title">Animals</h1>
+    </div>
+
+    <!-- Persistent sticky search — stays visible at all Animals levels -->
+    <div class="animals-search-sticky">
+      <div class="search-wrapper animals-search-inner">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="search-input" placeholder="Search all animals…" autocomplete="off" />
       </div>
-      <div class="filters" id="category-filters"></div>
     </div>
-    <div class="list-container" id="animal-list"></div>
+
+    <!-- Level 1: Landing page (category grid) -->
+    <div id="animals-landing">
+      <div class="landing-content">
+        <div class="category-grid" id="category-grid"></div>
+      </div>
+    </div>
+
+    <!-- Level 2: Category animal list -->
+    <div id="animals-category" hidden>
+      <div class="sticky-controls sticky-controls-cats">
+        <div class="filters" id="subcategory-filters"></div>
+      </div>
+      <div class="list-container" id="animal-list"></div>
+    </div>
+
+    <!-- Level 2 (search): Cross-category results -->
+    <div id="animals-search" hidden>
+      <div class="search-results-header" id="search-results-header"></div>
+      <div class="list-container" id="search-results-list"></div>
+    </div>
+
   </div>
 
-  <!-- ── Seen view ─────────────────────────────────────────── -->
+  <!-- ── Seen view ─────────────────────────────────────────────── -->
   <div id="seen-view" class="view" hidden>
-    <div class="stats-container">
-      <div class="stats-number" id="seen-count">0</div>
-      <div class="stats-text">Animals Seen in Brazil</div>
+
+    <!-- ── Level 0: All seen ──────────────────────────────────── -->
+    <div id="seen-all">
+
+      <!-- Hero: big count + Today trend + label -->
+      <div class="large-title-row seen-hero-row">
+        <div class="seen-hero-top">
+          <span class="seen-hero-number" id="seen-count">0</span>
+          <span class="seen-hero-today" id="seen-today" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B05B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
+            <span id="seen-today-count">0</span>&nbsp;Today
+          </span>
+        </div>
+        <div class="seen-hero-label">Animals seen</div>
+      </div>
+
+      <!-- Progress bar (total) -->
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="seen-fill-all" style="width:0%"></div></div>
+        <span class="progress-text" id="seen-label-all">0 of 237 species</span>
+      </div>
+
+      <!-- Category chips: tap to drill into a category's seen list -->
+      <div class="seen-cat-strip" id="seen-cat-strip"></div>
+
+      <!-- Sticky search -->
+      <div class="animals-search-sticky">
+        <div class="search-wrapper animals-search-inner">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="seen-search-input" placeholder="Search seen animals…" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="list-container" id="seen-list"></div>
     </div>
-    <div class="list-container" id="seen-list"></div>
+
+    <!-- ── Level 1: Single category seen (e.g. Mammals) ────────── -->
+    <div id="seen-category" hidden>
+
+      <!-- Hero: category count + category label -->
+      <div class="large-title-row seen-hero-row">
+        <div class="seen-hero-top">
+          <span class="seen-hero-number" id="seen-cat-count">0</span>
+        </div>
+        <div class="seen-hero-label" id="seen-cat-label">Mammals seen</div>
+      </div>
+
+      <!-- Progress bar (category) -->
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="seen-fill-cat" style="width:0%"></div></div>
+        <span class="progress-text" id="seen-label-cat">0 of 64 species</span>
+      </div>
+
+      <div class="list-container" id="seen-cat-list"></div>
+    </div>
+
   </div>
 
-  <!-- ── Today view (placeholder) ────────────────────────── -->
+  <!-- ── Today view ────────────────────────────────────────────── -->
   <div id="today-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -56,17 +146,17 @@
     </div>
   </div>
 
-  <!-- ── Places view (placeholder) ───────────────────────── -->
+  <!-- ── Places view ───────────────────────────────────────────── -->
   <div id="places-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
       <h2>Places</h2>
-      <p>Wildlife hotspots — national parks, lodges, and trails ranked by species diversity across both regions.</p>
+      <p>Wildlife hotspots — national parks, lodges, and trails ranked by species diversity.</p>
       <div class="dev-badge">In Development</div>
     </div>
   </div>
 
-  <!-- ── Add view (placeholder) ───────────────────────────── -->
+  <!-- ── Add view ──────────────────────────────────────────────── -->
   <div id="add-view" class="view dev-page" hidden>
     <div class="dev-content">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1D5D3B" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -76,10 +166,8 @@
     </div>
   </div>
 
-  <!-- ── Detail modal ──────────────────────────────────────── -->
+  <!-- ── Detail modal ──────────────────────────────────────────── -->
   <div class="modal" id="detail-modal" aria-modal="true" role="dialog" aria-hidden="true">
-
-    <!-- Sticky nav: transparent over hero, blurs on scroll -->
     <nav class="detail-nav" id="detail-nav">
       <button class="detail-nav-btn" id="close-modal-btn" aria-label="Go back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
@@ -89,8 +177,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
     </nav>
-
-    <!-- Hero image (extends behind the nav via negative margin) -->
     <div class="detail-hero" id="modal-img">
       <div class="hero-gradient-top"></div>
       <div class="hero-gradient-bottom"></div>
@@ -99,11 +185,7 @@
         <span class="material-symbols-outlined">expand_content</span>
       </button>
     </div>
-
-    <!-- Content card — rounded top, overlaps hero -->
     <div class="detail-card">
-
-      <!-- Status chips -->
       <div class="chip-row">
         <button class="chip chip-seen-btn" id="modal-seen-btn" aria-label="Toggle seen status">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -112,50 +194,28 @@
         <span class="chip chip-rarity" id="modal-rarity-chip"></span>
         <span class="chip" id="modal-conservation-chip" hidden></span>
       </div>
-
-      <!-- Description -->
       <p class="detail-desc" id="modal-desc"></p>
-
-      <!-- Stats horizontal scroll -->
       <div class="stats-scroll">
         <div class="stat-card">
           <div class="stat-row">
-            <div class="stat-cell">
-              <span class="stat-label-sm">Length</span>
-              <span class="stat-value-lg" id="modal-length">—</span>
-            </div>
-            <div class="stat-cell stat-cell-right">
-              <span class="stat-label-sm">Weight</span>
-              <span class="stat-value-lg" id="modal-weight">—</span>
-            </div>
+            <div class="stat-cell"><span class="stat-label-sm">Length</span><span class="stat-value-lg" id="modal-length">—</span></div>
+            <div class="stat-cell stat-cell-right"><span class="stat-label-sm">Weight</span><span class="stat-value-lg" id="modal-weight">—</span></div>
           </div>
           <div class="stat-row stat-row-border">
-            <div class="stat-cell">
-              <span class="stat-label-sm">Region</span>
-              <span class="stat-value-lg" id="modal-regions-stat">—</span>
-            </div>
-            <div class="stat-cell stat-cell-right">
-              <span class="stat-label-sm">Group</span>
-              <span class="stat-value-lg" id="modal-group-stat">—</span>
-            </div>
+            <div class="stat-cell"><span class="stat-label-sm">Region</span><span class="stat-value-lg" id="modal-regions-stat">—</span></div>
+            <div class="stat-cell stat-cell-right"><span class="stat-label-sm">Group</span><span class="stat-value-lg" id="modal-group-stat">—</span></div>
           </div>
         </div>
       </div>
-
-      <!-- Habitat -->
       <section class="detail-section">
         <h3 class="section-heading">Habitat</h3>
         <p class="section-body" id="modal-habitat"></p>
         <div class="habitat-chips" id="modal-habitat-chips"></div>
       </section>
-
-      <!-- Places -->
       <section class="detail-section">
         <h3 class="section-heading">Places</h3>
         <div class="places-list" id="modal-places"></div>
       </section>
-
-      <!-- Experiences -->
       <section class="detail-section detail-section-last">
         <h3 class="section-heading">Experiences</h3>
         <div class="experiences-empty">
@@ -163,17 +223,16 @@
           <p>No sightings logged yet.<br/>Be the first to spot this animal!</p>
         </div>
       </section>
-
     </div>
   </div>
 
-  <!-- ── Lightbox ──────────────────────────────────────────── -->
+  <!-- ── Lightbox ──────────────────────────────────────────────── -->
   <div id="lightbox" class="lightbox" hidden>
     <img id="lightbox-img" src="" alt="" />
     <button class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
   </div>
 
-  <!-- ── Bottom tab bar ────────────────────────────────────── -->
+  <!-- ── Bottom tab bar ────────────────────────────────────────── -->
   <nav class="tab-bar" role="navigation" aria-label="Main navigation">
     <button class="tab-item" data-tab="today" aria-label="Today">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -198,9 +257,91 @@
     </button>
   </nav>
 
+  <!-- ── Filter bottom sheet ──────────────────────────────────── -->
+  <div class="bottom-sheet" id="filter-sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Filter</h2>
+      <button class="sheet-close-btn" id="filter-sheet-close" aria-label="Close filter">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p class="sheet-section-label">Country</p>
+      <div class="country-row">
+        <span class="country-flag">🇧🇷</span>
+        <span class="country-name">Brazil</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D2818" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="sheet-coming-soon">More countries coming soon — Colombia, Ecuador, Peru & Bolivia.</p>
+    </div>
+  </div>
+
+  <!-- ── Settings bottom sheet ─────────────────────────────────── -->
+  <div class="bottom-sheet" id="settings-sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Settings</h2>
+      <button class="sheet-close-btn" id="settings-sheet-close" aria-label="Close settings">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="settings-app-block">
+        <img src="icon.png" class="settings-app-icon" alt="Seen" />
+        <div class="settings-app-name">Seen</div>
+        <div class="settings-app-sub">Brazil Wildlife Tracker · v0.1 Beta</div>
+      </div>
+      <div class="settings-dev-banner">
+        <span>🚧</span>
+        <div>
+          <div class="settings-dev-title">In Development</div>
+          <div class="settings-dev-body">Seen is being actively built. New countries, social features, and offline mode are on their way.</div>
+        </div>
+      </div>
+      <p class="sheet-section-label" style="margin-top:20px">Coming soon</p>
+      <div class="settings-rows">
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Notifications</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export sightings</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Community sightings</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>More countries</span>
+          </div>
+          <span class="settings-soon-pill">Soon</span>
+        </div>
+      </div>
+      <p class="settings-footer">Built for wildlife enthusiasts exploring Brazil's Pantanal, Bonito &amp; Rio de Janeiro.</p>
+    </div>
+  </div>
+
+  <!-- ── Shared sheet backdrop ──────────────────────────────────── -->
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
+
   <script src="rarity.js"></script>
   <script src="conservation.js"></script>
   <script src="data.js"></script>
+  <script src="data-extra.js"></script>
+  <script src="data-extra2.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
