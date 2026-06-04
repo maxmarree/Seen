@@ -47,6 +47,10 @@ const PLACES = {
 };
 const CON_LABELS = { NT:"Near Threatened",VU:"Vulnerable",EN:"Endangered",CR:"Critically Endangered" };
 
+// ─── Image cache ──────────────────────────────────────────────
+const thumbCache = {};   // list-card thumbnails, keyed by animal id
+const largeCache = {};   // modal hero / lightbox images, keyed by animal id
+
 // ─── Image fetcher: iNaturalist → Wikipedia fallback ─────────
 // iNaturalist is a wildlife-specific platform — photos are
 // verified observations, so "Corvina" returns a fish, not grapes.
