@@ -935,3 +935,41 @@ body {
 .seen-cat-chip-name  { font-size: 14px; font-weight: 600; color: #303030; white-space: nowrap; }
 .seen-cat-chip-count { font-size: 12px; color: var(--text-light); white-space: nowrap; }
 .seen-cat-chip-count.some { color: #14AE5C; font-weight: 500; }
+
+
+/* ─── Fix: CSS display:flex overrides [hidden] attribute ──────────
+   The browser UA stylesheet has low specificity for [hidden]{display:none}.
+   .app-header-back has display:flex which wins. This forces it back.   */
+.app-header-back[hidden] { display: none !important; }
+
+/* ─── Category page overlays (iOS push navigation) ────────────────
+   Both category pages sit fixed above the base content (z 35),
+   below the tab bar (z 40) and header (z 40), so both stay visible.
+   They start off-screen and slide in/out via .page-active.           */
+#animals-category,
+#seen-category {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 35;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-top: var(--header-h);
+  padding-bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom, 0px));
+}
+#animals-category.page-active,
+#seen-category.page-active { transform: translateX(0); }
+
+/* Subcategory chips sticky inside the category overlay:
+   stick right at the bottom of the header (not search-bar height below it) */
+#animals-category .sticky-controls-cats {
+  top: var(--header-h);
+  z-index: 36;
+}
+
+/* Seen category overlay: list container spacing */
+#seen-category .list-container { padding-top: 4px; }
