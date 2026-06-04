@@ -91,8 +91,8 @@ body {
   padding: 4px 20px 12px;
 }
 .large-title {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 40px;
+  font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
   color: #1A1A1A;
@@ -149,7 +149,8 @@ body {
   margin: 0 20px 10px;
 }
 .search-icon { color: var(--text-light); flex-shrink: 0; }
-#search-input {
+#search-input,
+#seen-search-input {
   flex: 1;
   border: none;
   outline: none;
@@ -158,8 +159,10 @@ body {
   color: var(--text-dark);
   min-width: 0;
 }
-#search-input::placeholder { color: var(--text-light); }
-#search-input::-webkit-search-cancel-button { cursor: pointer; }
+#search-input::placeholder,
+#seen-search-input::placeholder { color: var(--text-light); }
+#search-input::-webkit-search-cancel-button,
+#seen-search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ─── Category filter chips ───────────────────────────────── */
 .filters {
@@ -867,3 +870,68 @@ body {
   font-size: 13px; color: #AAAAAA;
   text-align: center; margin-top: 20px; line-height: 1.6;
 }
+
+
+/* ─── Progress bars ────────────────────────────────────────────── */
+.progress-wrap {
+  padding: 0 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.progress-track {
+  height: 8px;
+  background: rgba(20, 174, 92, 0.18);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #14AE5C;
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: 2px;           /* always show a sliver even at 0% */
+}
+.progress-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+/* ─── Seen category chips (horizontal strip) ───────────────────── */
+.seen-cat-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 0 20px 16px;
+  scrollbar-width: none;
+}
+.seen-cat-strip::-webkit-scrollbar { display: none; }
+
+.seen-cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border: 1px solid #F3F3F3;
+  border-radius: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s, border-color 0.12s;
+}
+.seen-cat-chip:active { background: #F5F5F5; }
+.seen-cat-chip.has-seen { border-color: rgba(20, 174, 92, 0.3); }
+
+.seen-cat-chip-emoji { font-size: 22px; line-height: 1; }
+
+.seen-cat-chip-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+.seen-cat-chip-name  { font-size: 14px; font-weight: 600; color: #303030; white-space: nowrap; }
+.seen-cat-chip-count { font-size: 12px; color: var(--text-light); white-space: nowrap; }
+.seen-cat-chip-count.some { color: #14AE5C; font-weight: 500; }

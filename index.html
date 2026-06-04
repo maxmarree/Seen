@@ -79,27 +79,61 @@
   <!-- ── Seen view ─────────────────────────────────────────────── -->
   <div id="seen-view" class="view" hidden>
 
-    <!-- Large title: seen count + label (collapses to "Seen" on scroll) -->
-    <div class="large-title-row seen-hero-row">
-      <div class="seen-hero-top">
-        <span class="seen-hero-number" id="seen-count">0</span>
-        <span class="seen-hero-today" id="seen-today" hidden>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B05B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
-          <span id="seen-today-count">0</span>&nbsp;Today
-        </span>
+    <!-- ── Level 0: All seen ──────────────────────────────────── -->
+    <div id="seen-all">
+
+      <!-- Hero: big count + Today trend + label -->
+      <div class="large-title-row seen-hero-row">
+        <div class="seen-hero-top">
+          <span class="seen-hero-number" id="seen-count">0</span>
+          <span class="seen-hero-today" id="seen-today" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B05B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
+            <span id="seen-today-count">0</span>&nbsp;Today
+          </span>
+        </div>
+        <div class="seen-hero-label">Animals seen</div>
       </div>
-      <div class="seen-hero-label">Animals seen</div>
+
+      <!-- Progress bar (total) -->
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="seen-fill-all" style="width:0%"></div></div>
+        <span class="progress-text" id="seen-label-all">0 of 237 species</span>
+      </div>
+
+      <!-- Category chips: tap to drill into a category's seen list -->
+      <div class="seen-cat-strip" id="seen-cat-strip"></div>
+
+      <!-- Sticky search -->
+      <div class="animals-search-sticky">
+        <div class="search-wrapper animals-search-inner">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="seen-search-input" placeholder="Search seen animals…" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="list-container" id="seen-list"></div>
     </div>
 
-    <!-- Sticky search for the seen list -->
-    <div class="animals-search-sticky">
-      <div class="search-wrapper animals-search-inner">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="search" id="seen-search-input" placeholder="Search animals you've seen…" autocomplete="off" />
+    <!-- ── Level 1: Single category seen (e.g. Mammals) ────────── -->
+    <div id="seen-category" hidden>
+
+      <!-- Hero: category count + category label -->
+      <div class="large-title-row seen-hero-row">
+        <div class="seen-hero-top">
+          <span class="seen-hero-number" id="seen-cat-count">0</span>
+        </div>
+        <div class="seen-hero-label" id="seen-cat-label">Mammals seen</div>
       </div>
+
+      <!-- Progress bar (category) -->
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="seen-fill-cat" style="width:0%"></div></div>
+        <span class="progress-text" id="seen-label-cat">0 of 64 species</span>
+      </div>
+
+      <div class="list-container" id="seen-cat-list"></div>
     </div>
 
-    <div class="list-container" id="seen-list"></div>
   </div>
 
   <!-- ── Today view ────────────────────────────────────────────── -->

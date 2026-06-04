@@ -8,13 +8,24 @@ let activeTab       = 'animals';
 let navScrollHandler = null;
 
 const HEADER_H = 64;                       // matches --header-h
-const todayStr = () => new Date().toISOString().slice(0, 10);
+
+// Local date string YYYY-MM-DD (not UTC, so it matches the user's timezone)
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 // Animals-view navigation state
 const animalsNav = {
   level:       'landing',   // 'landing' | 'category' | 'search'
   category:    null,        // e.g. 'Mammals'
   subCategory: 'All'
+};
+
+// Seen-view navigation state
+const seenNav = {
+  level:    'all',    // 'all' | 'category'
+  category: null      // e.g. 'Mammals'
 };
 
 // ─── Category definitions ─────────────────────────────────────
@@ -261,6 +272,74 @@ function showAnimalsSearch() {
   onScroll();
 }
 
+// ─── Seen navigation ──────────────────────────────────────────
+function showSeenAll() {
+  seenNav.level    = 'all';
+  seenNav.category = null;
+  seenSearchQuery  = '';
+  const inp = document.getElementById('seen-search-input');
+  if (inp) inp.value = '';
+
+  document.getElementById('seen-all').hidden      = false;
+  document.getElementById('seen-category').hidden = true;
+
+  renderSeenChips();
+  renderSeenList();
+  updateSeenCount();
+  syncHeader();
+  onScroll();
+}
+
+function showSeenCategory(cat) {
+  seenNav.level    = 'category';
+  seenNav.category = cat;
+
+  document.getElementById('seen-all').hidden      = true;
+  document.getElementById('seen-category').hidden = false;
+
+  const catTotal  = animals.filter(a => a.mainCategory === cat).length;
+  const catSeen   = animals.filter(a => seenList.includes(a.id) && a.mainCategory === cat);
+  const pct       = catTotal > 0 ? Math.round(catSeen.length / catTotal * 100) : 0;
+
+  document.getElementById('seen-cat-count').textContent = catSeen.length;
+  document.getElementById('seen-cat-label').textContent = `${cat} seen`;
+  document.getElementById('seen-fill-cat').style.width  = pct + '%';
+  document.getElementById('seen-label-cat').textContent =
+    `${catSeen.length} of ${catTotal} species · ${pct}%`;
+
+  const container = document.getElementById('seen-cat-list');
+  const emoji = CATEGORY_META.find(c => c.id === cat)?.emoji ?? '';
+  container.innerHTML = catSeen.length
+    ? catSeen.map(createCardHTML).join('')
+    : `<div class="empty-state">No ${emoji} ${cat.toLowerCase()} seen yet.<br/>Go explore!</div>`;
+  loadImages(catSeen);
+
+  window.scrollTo(0, 0);
+  syncHeader();
+  onScroll();
+}
+
+// ─── Seen category chips ───────────────────────────────────────
+function renderSeenChips() {
+  const strip = document.getElementById('seen-cat-strip');
+  strip.innerHTML = CATEGORY_META.map(cat => {
+    const total   = animals.filter(a => a.mainCategory === cat.id).length;
+    if (total === 0) return '';
+    const seenN   = seenList.filter(id => {
+      const a = animals.find(x => x.id === id);
+      return a && a.mainCategory === cat.id;
+    }).length;
+    const hasSeen = seenN > 0;
+    return `<button class="seen-cat-chip${hasSeen ? ' has-seen' : ''}" data-seen-cat="${cat.id}">
+      <span class="seen-cat-chip-emoji">${cat.emoji}</span>
+      <div class="seen-cat-chip-info">
+        <span class="seen-cat-chip-name">${cat.label}</span>
+        <span class="seen-cat-chip-count${hasSeen ? ' some' : ''}">${seenN} / ${total}</span>
+      </div>
+    </button>`;
+  }).join('');
+}
+
 // ─── Seen toggle ──────────────────────────────────────────────
 function toggleSeen(id) {
   const wasSeen = seenList.includes(id);
@@ -277,7 +356,29 @@ function toggleSeen(id) {
   const isSeen = seenList.includes(id);
   const btn = document.querySelector(`[data-toggle="${id}"]`);
   if (btn) { btn.classList.toggle('seen', isSeen); btn.textContent = isSeen ? '✓' : ''; btn.ariaLabel = isSeen ? 'Mark unseen' : 'Mark as seen'; }
-  if (!document.getElementById('seen-view').hidden) renderSeenList();
+
+  // Refresh whichever seen sub-view is currently visible
+  if (!document.getElementById('seen-view').hidden) {
+    if (seenNav.level === 'category') {
+      // Re-render category list in place without resetting scroll
+      const cat     = seenNav.category;
+      const total   = animals.filter(a => a.mainCategory === cat).length;
+      const catSeen = animals.filter(a => seenList.includes(a.id) && a.mainCategory === cat);
+      const pct     = total > 0 ? Math.round(catSeen.length / total * 100) : 0;
+      document.getElementById('seen-cat-count').textContent = catSeen.length;
+      document.getElementById('seen-fill-cat').style.width  = pct + '%';
+      document.getElementById('seen-label-cat').textContent =
+        `${catSeen.length} of ${total} species · ${pct}%`;
+      const emoji = CATEGORY_META.find(c => c.id === cat)?.emoji ?? '';
+      document.getElementById('seen-cat-list').innerHTML = catSeen.length
+        ? catSeen.map(createCardHTML).join('')
+        : `<div class="empty-state">No ${emoji} ${cat.toLowerCase()} seen yet.<br/>Go explore!</div>`;
+      loadImages(catSeen);
+    } else {
+      renderSeenList();
+      renderSeenChips();     // keep chip counts fresh on the all-level
+    }
+  }
   updateSeenCount();
   if (activeAnimalId === id) updateSeenChip();
 }
@@ -304,21 +405,31 @@ function renderSeenList() {
 }
 
 function updateSeenCount() {
+  const total = animals.length;
+
+  // Hero number
   document.getElementById('seen-count').textContent = seenList.length;
-  const t = todayStr();
-  const todayN = Object.values(seenDates).filter(d => d === t).length;
-  const todayEl      = document.getElementById('seen-today');
-  const todayCountEl = document.getElementById('seen-today-count');
+
+  // Today trend
+  const t           = todayStr();
+  const todayN      = Object.values(seenDates).filter(d => d === t).length;
+  const todayEl     = document.getElementById('seen-today');
+  const todayCountEl= document.getElementById('seen-today-count');
   if (todayEl && todayCountEl) {
     todayCountEl.textContent = todayN;
     todayEl.hidden = todayN === 0;
   }
+
+  // Progress bar (all level)
+  const pct     = total > 0 ? Math.round(seenList.length / total * 100) : 0;
+  const fillEl  = document.getElementById('seen-fill-all');
+  const labelEl = document.getElementById('seen-label-all');
+  if (fillEl)  fillEl.style.width   = pct + '%';
+  if (labelEl) labelEl.textContent  = `${seenList.length} of ${total} species · ${pct}%`;
 }
 
+
 // ─── App header (iOS large-title pattern) ─────────────────────
-// Sets the collapsed title text, back button, and action icons
-// for the current tab/level. The large title in the page content
-// fades into this bar on scroll (see onScroll).
 function syncHeader() {
   const back  = document.getElementById('app-header-back');
   const right = document.getElementById('app-header-right');
@@ -331,7 +442,8 @@ function syncHeader() {
     if (animalsNav.level === 'category') { titleText = animalsNav.category; showBack = true; }
     else                                 { titleText = 'Animals'; }
   } else if (activeTab === 'seen') {
-    titleText = 'Seen';
+    if (seenNav.level === 'category') { titleText = seenNav.category; showBack = true; }
+    else                              { titleText = 'Seen'; }
   } else {
     titleText = { today: 'Today', places: 'Places', add: 'Log a Sighting' }[activeTab] || '';
   }
@@ -344,14 +456,17 @@ function syncHeader() {
 // Collapse / reveal the large title as the page scrolls.
 function getCollapseAnchor() {
   if (activeTab === 'animals') return document.getElementById('animals-large-title');
-  if (activeTab === 'seen')    return document.getElementById('seen-count');
-  return null;                                  // dev pages have no large title
+  if (activeTab === 'seen') {
+    if (seenNav.level === 'category') return document.getElementById('seen-cat-count');
+    return document.getElementById('seen-count');
+  }
+  return null;                                  // dev pages → force-title
 }
 
 function onScroll() {
   const header = document.getElementById('app-header');
   const anchor = getCollapseAnchor();
-  if (!anchor) {                                // dev pages → always show the title
+  if (!anchor) {
     header.classList.add('force-title');
     header.classList.remove('scrolled');
     return;
@@ -365,13 +480,13 @@ function onScroll() {
 const ALL_VIEWS = ['animals-view','seen-view','today-view','places-view','add-view'];
 
 function switchTab(tab) {
-  closeAllSheets();                              // dismiss any open sheet on tab change
+  closeAllSheets();
   activeTab = tab;
   ALL_VIEWS.forEach(v => { const el = document.getElementById(v); if (el) el.hidden = (v !== `${tab}-view`); });
   document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
 
   if (tab === 'animals') showAnimalsLanding();   // resets to landing + header
-  if (tab === 'seen')    renderSeenList();
+  if (tab === 'seen')    showSeenAll();           // always reset to level 0
 
   window.scrollTo(0, 0);
   syncHeader();
@@ -554,12 +669,20 @@ document.addEventListener('click', e => {
   const catCard = e.target.closest('.category-card');
   if (catCard?.dataset.category) { showAnimalsCategory(catCard.dataset.category); return; }
 
-  // Sub-category chip
+  // Seen category chip
+  const seenCatChip = e.target.closest('[data-seen-cat]');
+  if (seenCatChip?.dataset.seenCat) { showSeenCategory(seenCatChip.dataset.seenCat); return; }
+
+  // Sub-category chip (Animals)
   const subcat = e.target.closest('[data-subcat]');
   if (subcat) { animalsNav.subCategory = subcat.dataset.subcat; renderSubcategoryFilters(animalsNav.category); renderAnimalList(); return; }
 
-  // Back button in app header
-  if (e.target.closest('#app-header-back')) { showAnimalsLanding(); return; }
+  // Back button — Animals category → landing, Seen category → all
+  if (e.target.closest('#app-header-back')) {
+    if (activeTab === 'animals') { showAnimalsLanding(); return; }
+    if (activeTab === 'seen')    { showSeenAll();        return; }
+    return;
+  }
 
   // Seen toggle on card
   const toggle = e.target.closest('[data-toggle]');
