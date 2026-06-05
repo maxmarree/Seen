@@ -150,7 +150,8 @@ body {
 }
 .search-icon { color: var(--text-light); flex-shrink: 0; }
 #search-input,
-#seen-search-input {
+#seen-search-input,
+#cat-search-input {
   flex: 1;
   border: none;
   outline: none;
@@ -160,9 +161,11 @@ body {
   min-width: 0;
 }
 #search-input::placeholder,
-#seen-search-input::placeholder { color: var(--text-light); }
+#seen-search-input::placeholder,
+#cat-search-input::placeholder { color: var(--text-light); }
 #search-input::-webkit-search-cancel-button,
-#seen-search-input::-webkit-search-cancel-button { cursor: pointer; }
+#seen-search-input::-webkit-search-cancel-button,
+#cat-search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ─── Category filter chips ───────────────────────────────── */
 .filters {
@@ -955,8 +958,6 @@ body {
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   padding-top: var(--header-h);
   padding-bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom, 0px));
@@ -964,11 +965,15 @@ body {
 #animals-category.page-active,
 #seen-category.page-active { transform: translateX(0); }
 
-/* Subcategory chips sticky inside the category overlay:
-   stick right at the bottom of the header (not search-bar height below it) */
+/* Inside the category overlay the search bar and chips are NOT sticky —
+   they scroll away with the content (more list real estate, and sticky
+   is unreliable inside an iOS fixed-overflow container). */
+#animals-category .cat-search-sticky {
+  position: static;
+  height: auto;
+}
 #animals-category .sticky-controls-cats {
-  top: var(--header-h);
-  z-index: 36;
+  position: static;
 }
 
 /* Seen category overlay: list container spacing */
