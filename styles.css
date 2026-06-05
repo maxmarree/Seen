@@ -965,16 +965,15 @@ body {
 #animals-category.page-active,
 #seen-category.page-active { transform: translateX(0); }
 
-/* Subcategory chips sticky inside the category overlay:
-   sit just below the in-overlay search bar */
-#animals-category .sticky-controls-cats {
-  top: calc(var(--header-h) + var(--search-bar-h));
-  z-index: 36;
-}
-/* In-overlay search bar sticks right below the header */
+/* Inside the category overlay the search bar and chips are NOT sticky —
+   they scroll away with the content (more list real estate, and sticky
+   is unreliable inside an iOS fixed-overflow container). */
 #animals-category .cat-search-sticky {
-  top: var(--header-h);
-  z-index: 37;
+  position: static;
+  height: auto;
+}
+#animals-category .sticky-controls-cats {
+  position: static;
 }
 
 /* Seen category overlay: list container spacing */
