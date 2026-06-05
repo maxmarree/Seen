@@ -150,7 +150,8 @@ body {
 }
 .search-icon { color: var(--text-light); flex-shrink: 0; }
 #search-input,
-#seen-search-input {
+#seen-search-input,
+#cat-search-input {
   flex: 1;
   border: none;
   outline: none;
@@ -160,9 +161,11 @@ body {
   min-width: 0;
 }
 #search-input::placeholder,
-#seen-search-input::placeholder { color: var(--text-light); }
+#seen-search-input::placeholder,
+#cat-search-input::placeholder { color: var(--text-light); }
 #search-input::-webkit-search-cancel-button,
-#seen-search-input::-webkit-search-cancel-button { cursor: pointer; }
+#seen-search-input::-webkit-search-cancel-button,
+#cat-search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ─── Category filter chips ───────────────────────────────── */
 .filters {
@@ -965,10 +968,15 @@ body {
 #seen-category.page-active { transform: translateX(0); }
 
 /* Subcategory chips sticky inside the category overlay:
-   stick right at the bottom of the header (not search-bar height below it) */
+   sit just below the in-overlay search bar */
 #animals-category .sticky-controls-cats {
-  top: var(--header-h);
+  top: calc(var(--header-h) + var(--search-bar-h));
   z-index: 36;
+}
+/* In-overlay search bar sticks right below the header */
+#animals-category .cat-search-sticky {
+  top: var(--header-h);
+  z-index: 37;
 }
 
 /* Seen category overlay: list container spacing */

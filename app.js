@@ -257,7 +257,9 @@ function showAnimalsCategory(category) {
   animalsNav.level = 'category';
   animalsNav.category = category;
   animalsNav.subCategory = 'All';
-  document.getElementById('search-input').placeholder = `Search ${category}…`;
+  searchQuery = '';
+  const catInp = document.getElementById('cat-search-input');
+  if (catInp) { catInp.value = ''; catInp.placeholder = `Search ${category}…`; }
 
   document.getElementById('animals-cat-title').textContent = category;
   renderSubcategoryFilters(category);
@@ -816,6 +818,15 @@ if (seenSearchEl) {
   seenSearchEl.addEventListener('input', e => {
     seenSearchQuery = e.target.value.trim();
     renderSeenList();
+  });
+}
+
+// In-category search (inside the Animals category overlay)
+const catSearchEl = document.getElementById('cat-search-input');
+if (catSearchEl) {
+  catSearchEl.addEventListener('input', e => {
+    searchQuery = e.target.value.trim();
+    renderAnimalList();           // renderAnimalList already applies searchQuery within the category
   });
 }
 
